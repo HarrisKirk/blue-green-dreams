@@ -7,7 +7,7 @@ env:
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   REPO_NAME: ${{secrets.REPO_NAME}}  
 jobs:
-  bci-platform-test:
+  build-app:
     runs-on: ubuntu-latest
     steps:
       - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
