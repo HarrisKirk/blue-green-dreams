@@ -1,0 +1,23 @@
+name: GWA build and test
+on: [push]
+env:
+  LINODE_ROOT_PASSWORD: ${{secrets.LINODE_ROOT_PASSWORD}}
+  LINODE_CLI_TOKEN: ${{secrets.LINODE_CLI_TOKEN}} 
+  DOCKER_USER: ${{secrets.DOCKER_USER}}
+  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+  REPO_NAME: ${{secrets.REPO_NAME}}  
+jobs:
+  bci-platform-test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code with a github Action
+        uses: actions/checkout@v3
+        with: 
+          fetch-depth: 0
+      - name: docker login
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD          
+      - name: Basic build
+        run: make build
+      - name: Final Status
+        run: echo "This job's status is ${{ job.status }}."
