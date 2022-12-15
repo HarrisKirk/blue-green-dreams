@@ -21,8 +21,6 @@ jobs:
       - name: docker login
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
       - name: Push image to Dockerhub
-        env:
-          DOCKER_IMAGE_NAME: cjtkirk1/gwa
         run: docker image push ${DOCKER_IMAGE_NAME}:latest
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
