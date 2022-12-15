@@ -23,6 +23,6 @@ jobs:
       - name: Push image to Dockerhub
         env:
           DOCKER_IMAGE_NAME: cjtkirk1/gwa
-        run: docker image push ${{DOCKER_IMAGE_NAME}}:latest
+        run: docker image push ${DOCKER_IMAGE_NAME}:latest
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
