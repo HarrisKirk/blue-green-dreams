@@ -20,9 +20,7 @@ jobs:
         run: make build
       - name: docker login
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
-      - name: Compute tag
-        run: BCI_TAG = `git describe --tags --always`
       - name: Push image to Dockerhub
-        run: docker image push ${DOCKER_IMAGE_NAME}:latest
+        run: make _push
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
