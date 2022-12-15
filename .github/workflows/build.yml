@@ -6,6 +6,7 @@ env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
   REPO_NAME: ${{secrets.REPO_NAME}}  
+  DOCKER_IMAGE_NAME: cjtkirk1/gwa  
 jobs:
   build-app:
     runs-on: ubuntu-latest
@@ -17,5 +18,11 @@ jobs:
           fetch-depth: 0
       - name: Basic build
         run: make build
+      - name: docker login
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+      - name: Push image to Dockerhub
+        run: docker image push $(DOCKER_IMAGE_NAME):latest
+        env:
+          DOCKER_IMAGE_NAME: ${{DOCKER_IMAGE_NAME}}
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
