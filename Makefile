@@ -18,4 +18,4 @@ _push: ## Push image to dockerhub
 	echo "The tag is $(APP_TAG)"
 	docker tag $(DOCKER_IMAGE_NAME):latest $(DOCKER_IMAGE_NAME):$(APP_TAG)
 	docker image push $(DOCKER_IMAGE_NAME):latest
-	docker image push $(DOCKER_IMAGE_NAME):$(BCI_TAG)
+	docker image push $(DOCKER_IMAGE_NAME):$(APP_TAG)
