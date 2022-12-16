@@ -24,3 +24,11 @@ jobs:
         run: make _push
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
+  deploy-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure no local images
+        run: docker images
+
+
+
