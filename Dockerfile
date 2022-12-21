@@ -11,4 +11,4 @@ RUN pip install black
 COPY . .
 VOLUME /root/.ssh
 
-CMD  ["/bin/bash", "-c", "bci --install-completion 1> /dev/null; /bin/bash"]
+CMD  ["/bin/bash", "-c", "exit 2"]
