@@ -11,4 +11,4 @@ RUN pip install black
 COPY . .
 VOLUME /root/.ssh
 
-CMD  ["/bin/bash", "-c", "exit 2"]
+CMD  ["/bin/bash", "-c", "echo GWA success"]
