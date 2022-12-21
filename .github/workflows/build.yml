@@ -10,8 +10,6 @@ env:
 
 jobs:
   build-app:
-    strategy:
-      max-parallel: 0
     runs-on: ubuntu-latest
     steps:
       - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
@@ -28,8 +26,7 @@ jobs:
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
   deploy-app:
-    strategy:
-      max-parallel: 0
+    needs: build-app
     runs-on: ubuntu-latest
     steps:
       - name: Ensure no local images
