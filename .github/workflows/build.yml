@@ -29,8 +29,9 @@ jobs:
     needs: build-app
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure no local images
-        run: docker images
+      - name: Run the container from dockerhub
+        run: docker run cjtkirk1/gwa:latest
+
 
 
 
