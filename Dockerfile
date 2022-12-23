@@ -9,6 +9,6 @@ RUN pip install -r requirements.txt --upgrade
 RUN pip install black
 
 COPY . .
-VOLUME /root/.ssh
 
-CMD  ["/bin/bash", "-c", "echo GWA success"]
+CMD  ["/bin/bash"]
+
