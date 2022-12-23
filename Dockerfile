@@ -10,5 +10,5 @@ RUN pip install black
 
 COPY . .
 
-CMD  ["/bin/bash", "-c", "echo GWA success"]
+CMD  ["echo", "GWA", "success!"]
 
