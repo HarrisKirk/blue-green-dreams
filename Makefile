@@ -1,6 +1,6 @@
 .PHONY: help build
 .SILENT: 
-BCI_CONTAINER_WORKDIR = /opt/devops-bci/gwa
+BCI_CONTAINER_WORKDIR = /opt/gwa
 DOCKER_IMAGE_NAME = cjtkirk1/gwa
 DOCKER_IMAGE = $(DOCKER_IMAGE_NAME):latest	
 DOCKER_RUN_CMD = docker container run --rm --name=gwa --workdir $(BCI_CONTAINER_WORKDIR) --user $(id -u):$(id -g)
