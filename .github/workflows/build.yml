@@ -30,11 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run the container from dockerhub
-        run: container_id=$(docker run --detach cjtkirk1/gwa:latest)
-      - name: Show docker logs
-        run: docker container rm -f $container_id
-
-
+        run: |
+            container_id=$(docker run --detach cjtkirk1/gwa:latest)
+            docker logs $container_id
 
 
 
