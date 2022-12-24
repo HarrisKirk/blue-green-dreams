@@ -32,6 +32,7 @@ jobs:
       - name: Run the container from dockerhub
         run: |
             container_id=$(docker run --detach cjtkirk1/gwa:latest)
+            echo "The container_id is '${container_id}'"
             docker logs $container_id
 
 
