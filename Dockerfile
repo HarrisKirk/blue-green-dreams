@@ -13,5 +13,5 @@ RUN pip install black
 
 COPY . .
 
-# CMD  ["echo", "GWA", "success!"]
+CMD  ["flask", "--app", "gwa/app.py", "run"]
 
