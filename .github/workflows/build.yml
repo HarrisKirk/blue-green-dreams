@@ -30,7 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run the container from dockerhub
-        run: docker run cjtkirk1/gwa:latest
+        run: docker run --detach cjtkirk1/gwa:latest
+
 
 
 
