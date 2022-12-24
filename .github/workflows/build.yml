@@ -34,6 +34,7 @@ jobs:
             container_id=$(docker run --detach cjtkirk1/gwa:latest)
             echo "The container_id is '${container_id}'"
             docker container ls -a
+            sleep 3
             docker logs $container_id
 
 
