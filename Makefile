@@ -3,7 +3,7 @@
 BCI_CONTAINER_WORKDIR = /opt/gwa
 DOCKER_IMAGE_NAME = cjtkirk1/gwa
 DOCKER_IMAGE = $(DOCKER_IMAGE_NAME):latest	
-DOCKER_RUN_CMD = docker container run --rm --name=gwa --user $(id -u):$(id -g)
+DOCKER_RUN_CMD = docker container run --network host --rm --name=gwa --user $(id -u):$(id -g)
 APP_TAG = `git describe --tags --always`
 
 help:
@@ -21,5 +21,5 @@ _push: ## Push image to dockerhub
 	docker image push $(DOCKER_IMAGE_NAME):latest
 	docker image push $(DOCKER_IMAGE_NAME):$(APP_TAG)
 
-gwa: build ## Enter the command line environment 
+gwa: build ## Run the app  
 	$(DOCKER_RUN_CMD) -it $(DOCKER_IMAGE)
