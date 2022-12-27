@@ -22,4 +22,5 @@ _push: ## Push image to dockerhub
 	docker image push $(DOCKER_IMAGE_NAME):$(APP_TAG)
 
 gwa: build ## Run the app  
-	$(DOCKER_RUN_CMD) -it $(DOCKER_IMAGE)
+	./test.sh
+	
