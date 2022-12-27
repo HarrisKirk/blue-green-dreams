@@ -13,5 +13,6 @@ RUN pip install black
 
 COPY . .
 
-CMD  ["flask", "--app", "gwa/app.py", "run"]
+CMD gunicorn -b 0.0.0.0:8000 --access-logfile - "gwa.app:create_app()"
+
 
