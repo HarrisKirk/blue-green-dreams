@@ -19,6 +19,8 @@ jobs:
           fetch-depth: 0
       - name: Basic build
         run: make build
+      - name: Basic test
+        run: make gwa
       - name: docker login
         run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
       - name: Push image to Dockerhub
