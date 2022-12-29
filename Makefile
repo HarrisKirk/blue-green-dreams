@@ -13,7 +13,7 @@ help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 build: ## Basic build of gwa image
-	docker image build --tag $(DOCKER_IMAGE) . ;\
+	docker image build --quiet --tag $(DOCKER_IMAGE) . ;\
 
 _push: ## Push image to dockerhub
 	echo "The tag is $(APP_TAG)"
