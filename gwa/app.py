@@ -16,6 +16,6 @@ def create_app():
 
         :return: Flask response
         """
-        return f"HelloxWorld! + {datetime.datetime.now()}"
+        return f"Hello World! + {datetime.datetime.now()}"
 
     return app
