@@ -21,6 +21,6 @@ _push: ## Push image to dockerhub
 	docker image push $(DOCKER_IMAGE_NAME):latest
 	docker image push $(DOCKER_IMAGE_NAME):$(APP_TAG)
 
-gwa: build ## Run the app  
+test: build ## Test the app  
 	./test.sh
 	
