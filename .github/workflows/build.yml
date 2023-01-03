@@ -31,13 +31,9 @@ jobs:
     needs: build-app
     runs-on: ubuntu-latest
     steps:
-      - name: Run the container from dockerhub
-        run: |
-            container_id=$(docker run --detach cjtkirk1/gwa:latest)
-            echo "The container_id is '${container_id}'"
-            docker container ls -a
-            sleep 3
-            docker logs $container_id
+      - name: Test the container from dockerhub
+        run: make test
+
 
 
 
