@@ -23,4 +23,4 @@ _push: ## Push image to dockerhub
 
 test: build ## Test the app  
 	./test.sh
-	
+
