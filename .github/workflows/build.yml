@@ -1,5 +1,7 @@
 name: GWA build and test
 on: [push]
+  branches:
+    - master
 env:
   LINODE_ROOT_PASSWORD: ${{secrets.LINODE_ROOT_PASSWORD}}
   LINODE_CLI_TOKEN: ${{secrets.LINODE_CLI_TOKEN}} 
