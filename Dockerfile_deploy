@@ -13,4 +13,4 @@ RUN pip install black
 
 COPY gwa-deploy .
 
-CMD python3 deploy.py
+CMD python manage.py

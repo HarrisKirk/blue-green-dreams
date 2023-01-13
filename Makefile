@@ -6,6 +6,8 @@ DOCKER_IMAGE = $(DOCKER_IMAGE_NAME):latest
 DOCKER_DEPLOY_IMAGE_NAME = cjtkirk1/gwa_deploy
 DOCKER_DEPLOY_IMAGE = $(DOCKER_DEPLOY_IMAGE_NAME):latest
 
+DOCKER_ENV_STRING = -e LINODE_CLI_TOKEN -e LINODE_ROOT_PASSWORD 
+
 APP_TAG = `git describe --tags --always`
 
 help:
@@ -30,4 +32,4 @@ test: build ## Test the gwa app
 	./test.sh
 
 test_deploy: build_deploy ## Test the code to deploy infrastructure
-	docker container run --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) 
+	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) 
