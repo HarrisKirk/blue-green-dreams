@@ -1,13 +1,4 @@
 Flask==2.2.2
-
-# Hello. This is Nick from the future (March 2019 to be exact). An emergency
-# addition had to be made below to fix an issue related to a recent version of
-# werkzeug. This library was not version locked in this file.
-#
-# The line below isn't covered on video, but it locks werkzeug to the latest
-# version that works with this course's code base. A future update video will
-# cover upgrading this package and more.
 werkzeug==2.2.2
-
 # Application server for both development and production.
 gunicorn==20.1.0
