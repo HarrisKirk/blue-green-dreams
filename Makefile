@@ -1,9 +1,11 @@
 .PHONY: help build
 .SILENT: 
-BCI_CONTAINER_WORKDIR = /opt/gwa
 DOCKER_IMAGE_NAME = cjtkirk1/gwa
 DOCKER_IMAGE = $(DOCKER_IMAGE_NAME):latest	
-DOCKER_RUN_CMD = docker container run --network host --rm --name=gwa --user $(id -u):$(id -g)
+
+DOCKER_DEPLOY_IMAGE_NAME = cjtkirk1/gwa_deploy
+DOCKER_DEPLOY_IMAGE = $(DOCKER_DEPLOY_IMAGE_NAME):latest
+
 APP_TAG = `git describe --tags --always`
 
 help:
@@ -12,15 +14,20 @@ help:
 	@echo ""
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-build: ## Basic build of gwa image
+build: ## Basic build of gwa: ie, image with all application code
 	docker image build --quiet --tag $(DOCKER_IMAGE) . ;\
 
-_push: ## Push image to dockerhub
+build_deploy: ## Basic build of gwa_deploy: ie, image with all deployment code
+	docker image build --quiet -f Dockerfile_deploy --tag $(DOCKER_DEPLOY_IMAGE_NAME) . ;\
+
+_push: ## Push application image to dockerhub
 	echo "The tag is $(APP_TAG)"
 	docker tag $(DOCKER_IMAGE_NAME):latest $(DOCKER_IMAGE_NAME):$(APP_TAG)
 	docker image push $(DOCKER_IMAGE_NAME):latest
 	docker image push $(DOCKER_IMAGE_NAME):$(APP_TAG)
 
-test: build ## Test the app  
+test: build ## Test the gwa app  
 	./test.sh
 
+test_deploy: build_deploy ## Test the code to deploy infrastructure
+	docker container run --rm -it --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) 

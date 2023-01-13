@@ -30,7 +30,7 @@ jobs:
         run: make _push
       - name: Final Status
         run: echo "This job's status is ${{ job.status }}."
-  deploy-app:
+  test-app:
     needs: build-app
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +40,16 @@ jobs:
           fetch-depth: 0
       - name: Test the container from dockerhub
         run: ./test.sh
+  deploy-app:
+    needs: test-app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code with a github Action
+        uses: actions/checkout@v3
+        with: 
+          fetch-depth: 0
+      - name: Create and test the deployment 
+        run: make test_deploy
 
 
 
