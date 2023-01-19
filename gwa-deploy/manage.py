@@ -11,6 +11,8 @@ logging.basicConfig(
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
+KUBERNETES_VERSION = "1.25"
+
 def configure_cluster():
     # Verify kubectl is installed
     cmd = [
@@ -32,7 +34,7 @@ def create_cluster():
         "--node_pools.type",
         "g6-standard-1",
         "--k8s_version",
-        "1.24",
+        KUBERNETES_VERSION,
         "--node_pools.count",
         "2",
         "--json",
