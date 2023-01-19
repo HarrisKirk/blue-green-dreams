@@ -1,7 +1,7 @@
 """
 Functions that provision the linode instances and volumes
 """
-from common import execute_cli
+from common import execute_cli, execute_sh
 import logging
 import time
 
@@ -10,6 +10,14 @@ logging.basicConfig(
     level=logging.INFO,
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
+
+def configure_cluster():
+    # Verify kubectl is installed
+    cmd = [
+        "kubectl"
+    ]
+    print(execute_sh(cmd))
+    return
 
 def create_cluster():
     """Create a K8S cluster"""
@@ -49,6 +57,7 @@ if __name__ == "__main__":
     cluster_id = create_cluster() 
     logging.info(f"Cluster id '{cluster_id}' was created")
     logging.info(f"Sleeping for the nodes to enter Running state (see GH-19)...")
+    configure_cluster()
     time.sleep(180)
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")   

@@ -11,6 +11,11 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --upgrade
 RUN pip install black
 
+# Download kubectl for working with the k8s cluster
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" ;\
+    mv kubectl /bin ;\
+    chmod 775 /bin/kubectl
+
 COPY gwa-deploy .
 
 CMD python manage.py

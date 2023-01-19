@@ -27,4 +27,10 @@ def execute_cli(cmd):
         raise Exception()
 
 
+def execute_sh(cmd):
+    """Execute local sh command within the docker container"""
+    logging.debug(" ".join(cmd))
+    p = subprocess.run(cmd, check=True, shell=True, capture_output=True)
+    return p.stdout.decode().rstrip()
+
 
