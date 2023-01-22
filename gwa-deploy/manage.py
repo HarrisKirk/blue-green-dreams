@@ -30,8 +30,12 @@ def get_kubeconfig(cluster_id):
 def configure_cluster():
     # Verify kubectl is installed
     cmd = [
-        "kubectl"
+        "kubectl",
+        "version",
+        "--output=yaml",
+        "--client=true"
     ]
+    logging.debug(execute_sh(cmd))
     return
 
 def create_cluster():
