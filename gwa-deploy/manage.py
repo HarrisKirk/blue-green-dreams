@@ -1,5 +1,5 @@
 """
-Functions that provision the linode instances and volumes
+Manage all aspects of the creation of infrastructure and app deployment
 """
 from common import execute_cli, execute_sh
 import logging
@@ -20,7 +20,7 @@ def get_kubeconfig(cluster_id):
         "--json",
         "lke",
         "kubeconfig-view",
-        str(cluster_id),
+        cluster_id,
     ]
     json_object = execute_cli(cmd)
     base_64_kubeconfig = json_object[0]["kubeconfig"]
@@ -58,7 +58,7 @@ def create_cluster():
     ]
     json_object = execute_cli(cmd)
     cluster_id = json_object[0]["id"]
-    return cluster_id
+    return str(cluster_id)
 
 def delete_cluster(cluster_id):
     """Delete a K8S cluster"""
@@ -66,7 +66,7 @@ def delete_cluster(cluster_id):
         "linode-cli",
         "lke",
         "cluster-delete",
-        str(cluster_id)
+        cluster_id
     ]
     json_object = execute_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")

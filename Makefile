@@ -33,3 +33,4 @@ test: build ## Test the gwa app
 
 test_deploy: build_deploy ## Test the code to deploy infrastructure
 	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) 
+

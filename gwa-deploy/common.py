@@ -7,8 +7,7 @@ import logging
 
 
 def execute_cli(cmd):
-    """Run a command.   Assume the command is a linode-cli command and process accordingly
-    """
+    """Run a command.   Assume the command is a linode-cli command and process error accordingly"""
     logging.debug(" ".join(cmd))
     completed_process = subprocess.run(cmd, cwd=".", check=False, shell=False, capture_output=True)
 
@@ -28,7 +27,7 @@ def execute_cli(cmd):
 
 
 def execute_sh(cmd):
-    """Execute local sh command within the docker container"""
+    """Execute local shell command within the docker container"""
     logging.debug(" ".join(cmd))
     p = subprocess.run(cmd, check=True, shell=False, capture_output=True)
     return p.stdout.decode().rstrip()
