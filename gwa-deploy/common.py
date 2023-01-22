@@ -30,6 +30,8 @@ def execute_sh(cmd):
     """Execute local shell command within the docker container"""
     logging.debug(" ".join(cmd))
     p = subprocess.run(cmd, check=True, shell=False, capture_output=True)
-    return p.stdout.decode().rstrip()
+    output = p.stdout.decode().rstrip()
+    logging.debug(output)
+    return output
 
 

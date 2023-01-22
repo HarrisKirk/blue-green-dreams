@@ -5,6 +5,7 @@ from common import execute_cli, execute_sh
 import logging
 import time
 import base64
+import json
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
@@ -13,6 +14,8 @@ logging.basicConfig(
 )
 
 KUBERNETES_VERSION = "1.25"
+KUBECONFIG_FILE = "/tmp/kubeconfig.yaml"
+KUBERNETES_NODE_COUNT = "2"
 
 def get_kubeconfig(cluster_id):
     cmd = [
@@ -27,15 +30,21 @@ def get_kubeconfig(cluster_id):
     logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
     return base64.b64decode(base_64_kubeconfig).decode('ascii')
 
-def configure_cluster():
-    # Verify kubectl is installed
+def verify_cluster_communication():
+    # Verify kubectl is communicating with cluster
     cmd = [
         "kubectl",
-        "version",
-        "--output=yaml",
-        "--client=true"
+        f"--kubeconfig={KUBECONFIG_FILE}",
+        "--output=json",
+        "get",
+        "nodes"
     ]
-    logging.debug(execute_sh(cmd))
+    output = execute_sh(cmd)
+    json_object = json.loads(output)
+    nodes = json_object["items"]
+    if len(nodes) != int(KUBERNETES_NODE_COUNT):
+        raise Exception(f"kubectl expected {int(KUBERNETES_NODE_COUNT)} nodes but found {len(nodes)}")
+    logging.info(f"kubectl OK: Retrieved node count: {len(nodes)}")
     return
 
 def create_cluster():
@@ -53,7 +62,7 @@ def create_cluster():
         "--k8s_version",
         KUBERNETES_VERSION,
         "--node_pools.count",
-        "2",
+        KUBERNETES_NODE_COUNT,
         "--json",
     ]
     json_object = execute_cli(cmd)
@@ -72,6 +81,11 @@ def delete_cluster(cluster_id):
     logging.debug(f"cluster-delete returned {json_object}")
     return
 
+def write_kubeconfig(kubeconfig):
+    with  open(KUBECONFIG_FILE, "w") as file:
+        file.write(kubeconfig)
+    return
+
 if __name__ == "__main__":
     cluster_id = create_cluster() 
     logging.info(f"Cluster id '{cluster_id}' was created")
@@ -79,7 +93,8 @@ if __name__ == "__main__":
     time.sleep(300)
     kubeconfig = get_kubeconfig(cluster_id)
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
-    configure_cluster()
+    write_kubeconfig(kubeconfig)
+    verify_cluster_communication()
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")   
 
