@@ -6,6 +6,7 @@ import logging
 import time
 import base64
 import json
+from retry import retry
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
@@ -17,6 +18,8 @@ KUBERNETES_VERSION = "1.25"
 KUBECONFIG_FILE = "/tmp/kubeconfig.yaml"
 KUBERNETES_NODE_COUNT = "2"
 
+
+@retry(tries=12, delay=30, logger=logging.getLogger())
 def get_kubeconfig(cluster_id):
     cmd = [
         "linode-cli",
@@ -30,6 +33,7 @@ def get_kubeconfig(cluster_id):
     logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
     return base64.b64decode(base_64_kubeconfig).decode('ascii')
 
+@retry(tries=12, delay=30, logger=logging.getLogger())
 def verify_cluster_communication():
     # Verify kubectl is communicating with cluster
     cmd = [
@@ -89,8 +93,6 @@ def write_kubeconfig(kubeconfig):
 if __name__ == "__main__":
     cluster_id = create_cluster() 
     logging.info(f"Cluster id '{cluster_id}' was created")
-    logging.info(f"Sleeping for the nodes to enter Running state (see GH-19)...")
-    time.sleep(300)
     kubeconfig = get_kubeconfig(cluster_id)
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)

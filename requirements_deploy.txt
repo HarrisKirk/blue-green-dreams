@@ -1,2 +1,3 @@
 # Requirements of code to deploy the infrastructure
 linode-cli
+retry
