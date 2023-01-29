@@ -90,7 +90,7 @@ def write_kubeconfig(kubeconfig):
         file.write(kubeconfig)
     return
 
-if __name__ == "__main__":
+def verify_deployment():
     cluster_id = create_cluster() 
     logging.info(f"Cluster id '{cluster_id}' was created")
     kubeconfig = get_kubeconfig(cluster_id)
@@ -99,4 +99,8 @@ if __name__ == "__main__":
     verify_cluster_communication()
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")   
+
+
+if __name__ == "__main__":
+    verify_deployment()
 
