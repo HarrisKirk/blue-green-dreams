@@ -33,5 +33,3 @@ def execute_sh(cmd):
     output = p.stdout.decode().rstrip()
     logging.debug(output)
     return output
-
-

@@ -1,6 +1,7 @@
 from flask import Flask
 import datetime
 
+
 def create_app():
     """
     Create a Flask Good Weather application using the app factory pattern.
@@ -9,7 +10,7 @@ def create_app():
     """
     app = Flask(__name__)
 
-    @app.route('/')
+    @app.route("/")
     def index():
         """
         Render a Hello World response.

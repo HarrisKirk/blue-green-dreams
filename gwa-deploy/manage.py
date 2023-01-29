@@ -31,18 +31,13 @@ def get_kubeconfig(cluster_id):
     json_object = execute_cli(cmd)
     base_64_kubeconfig = json_object[0]["kubeconfig"]
     logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
-    return base64.b64decode(base_64_kubeconfig).decode('ascii')
+    return base64.b64decode(base_64_kubeconfig).decode("ascii")
+
 
 @retry(tries=12, delay=30, logger=logging.getLogger())
 def verify_cluster_communication():
     # Verify kubectl is communicating with cluster
-    cmd = [
-        "kubectl",
-        f"--kubeconfig={KUBECONFIG_FILE}",
-        "--output=json",
-        "get",
-        "nodes"
-    ]
+    cmd = ["kubectl", f"--kubeconfig={KUBECONFIG_FILE}", "--output=json", "get", "nodes"]
     output = execute_sh(cmd)
     json_object = json.loads(output)
     nodes = json_object["items"]
@@ -50,6 +45,7 @@ def verify_cluster_communication():
         raise Exception(f"kubectl expected {int(KUBERNETES_NODE_COUNT)} nodes but found {len(nodes)}")
     logging.info(f"kubectl OK: Retrieved node count: {len(nodes)}")
     return
+
 
 def create_cluster():
     """Create a K8S cluster"""
@@ -73,34 +69,31 @@ def create_cluster():
     cluster_id = json_object[0]["id"]
     return str(cluster_id)
 
+
 def delete_cluster(cluster_id):
     """Delete a K8S cluster"""
-    cmd = [
-        "linode-cli",
-        "lke",
-        "cluster-delete",
-        cluster_id
-    ]
+    cmd = ["linode-cli", "lke", "cluster-delete", cluster_id]
     json_object = execute_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
     return
 
+
 def write_kubeconfig(kubeconfig):
-    with  open(KUBECONFIG_FILE, "w") as file:
+    with open(KUBECONFIG_FILE, "w") as file:
         file.write(kubeconfig)
     return
 
+
 def verify_deployment():
-    cluster_id = create_cluster() 
+    cluster_id = create_cluster()
     logging.info(f"Cluster id '{cluster_id}' was created")
     kubeconfig = get_kubeconfig(cluster_id)
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
     verify_cluster_communication()
     delete_cluster(cluster_id)
-    logging.info(f"Cluster id '{cluster_id}' was deleted")   
+    logging.info(f"Cluster id '{cluster_id}' was deleted")
 
 
 if __name__ == "__main__":
     verify_deployment()
-
