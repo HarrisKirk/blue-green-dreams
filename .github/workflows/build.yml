@@ -49,7 +49,7 @@ jobs:
         with: 
           fetch-depth: 0
       - name: Create and test the deployment 
-        run: make test_deploy
+        run: make deploy_test
 
 
 
