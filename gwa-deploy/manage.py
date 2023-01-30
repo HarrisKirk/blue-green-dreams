@@ -6,6 +6,7 @@ import logging
 import time
 import base64
 import json
+import sys  
 from retry import retry
 
 logging.basicConfig(
@@ -47,14 +48,14 @@ def verify_cluster_communication():
     return
 
 
-def create_cluster():
+def create_cluster(k8s_env):
     """Create a K8S cluster"""
     cmd = [
         "linode-cli",
         "lke",
         "cluster-create",
         "--label",
-        "gwa",
+        k8s_env,
         "--region",
         "us-east",
         "--node_pools.type",
@@ -84,8 +85,8 @@ def write_kubeconfig(kubeconfig):
     return
 
 
-def verify_deployment():
-    cluster_id = create_cluster()
+def verify_deployment(k8s_env):
+    cluster_id = create_cluster(k8s_env)
     logging.info(f"Cluster id '{cluster_id}' was created")
     kubeconfig = get_kubeconfig(cluster_id)
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
@@ -96,4 +97,6 @@ def verify_deployment():
 
 
 if __name__ == "__main__":
-    verify_deployment()
+    k8s_env = sys.argv[1]
+    logging.info(f"Creating k8s environment '{k8s_env}'")
+    verify_deployment(k8s_env)    
