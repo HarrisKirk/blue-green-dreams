@@ -20,7 +20,7 @@ KUBECONFIG_FILE = "/tmp/kubeconfig.yaml"
 KUBERNETES_NODE_COUNT = "2"
 
 
-@retry(tries=20, delay=30, logger=logging.getLogger())
+@retry(tries=60, delay=30, logger=logging.getLogger())
 def get_kubeconfig(cluster_id):
     cmd = [
         "linode-cli",
@@ -35,7 +35,7 @@ def get_kubeconfig(cluster_id):
     return base64.b64decode(base_64_kubeconfig).decode("ascii")
 
 
-@retry(tries=20, delay=30, logger=logging.getLogger())
+@retry(tries=60, delay=30, logger=logging.getLogger())
 def verify_cluster_communication():
     # Verify kubectl is communicating with cluster
     cmd = ["kubectl", f"--kubeconfig={KUBECONFIG_FILE}", "--output=json", "get", "nodes"]
