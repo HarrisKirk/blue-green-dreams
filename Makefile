@@ -32,10 +32,10 @@ test: build ## Test the gwa app
 	./test.sh
 
 deploy_dev: build_deploy ## Test the code to deploy infrastructure
-	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) gwa_dev
+	docker container run $(DOCKER_ENV_STRING) -it --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) python manage.py gwa_dev
 
 deploy_test: build_deploy ## Test the code to deploy infrastructure
-	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) gwa_test
+	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) python manage.py gwa_test
 
 format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa $(DOCKER_IMAGE_NAME) black --verbose --line-length=120 /gwa;\
