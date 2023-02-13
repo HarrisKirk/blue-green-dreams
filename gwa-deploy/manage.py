@@ -7,7 +7,9 @@ import time
 import base64
 import json
 import sys  
+import os
 from retry import retry
+
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
@@ -16,7 +18,6 @@ logging.basicConfig(
 )
 
 KUBERNETES_VERSION = "1.25"
-KUBECONFIG_FILE = "/tmp/kubeconfig.yaml"
 KUBERNETES_NODE_COUNT = "2"
 
 
@@ -38,7 +39,7 @@ def get_kubeconfig(cluster_id):
 @retry(tries=60, delay=30, logger=logging.getLogger())
 def verify_cluster_communication():
     # Verify kubectl is communicating with cluster
-    cmd = ["kubectl", f"--kubeconfig={KUBECONFIG_FILE}", "--output=json", "get", "nodes"]
+    cmd = ["kubectl", "--output=json", "get", "nodes"]
     output = execute_sh(cmd)
     json_object = json.loads(output)
     nodes = json_object["items"]
@@ -80,7 +81,10 @@ def delete_cluster(cluster_id):
 
 
 def write_kubeconfig(kubeconfig):
-    with open(KUBECONFIG_FILE, "w") as file:
+    KUBECONFIG_DIR = os.environ['HOME'] + "/.kube"
+    KUBECONFIG_FILE_PATH = KUBECONFIG_DIR + "/config"
+    os.mkdir(KUBECONFIG_DIR)
+    with open(KUBECONFIG_FILE_PATH, "w") as file:
         file.write(kubeconfig)
     return
 
