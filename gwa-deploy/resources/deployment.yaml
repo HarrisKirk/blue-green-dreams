@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gwa-deployment
+  labels:
+    app: gwa
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gwa
+  template:
+    metadata:
+      labels:
+        app: gwa
+    spec:
+      containers:
+      - name: gwa
+        image: cjtkirk1/gwa:latest
+        ports:
+        - containerPort: 80
+        

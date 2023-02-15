@@ -48,6 +48,14 @@ def verify_cluster_communication():
     logging.info(f"kubectl OK: Retrieved node count: {len(nodes)}")
     return
 
+def apply_deployment():
+    cmd = ["kubectl", "--output=json", "apply", "-f", "resources/deployment.yaml"]
+    output = execute_sh(cmd)
+    json_object = json.loads(output)
+    logging.debug(f"json ==> {json_object}")
+    logging.info(f"kubectl deployment OK")
+    return
+
 
 def create_cluster(k8s_env):
     """Create a K8S cluster"""
@@ -96,6 +104,7 @@ def verify_deployment(k8s_env):
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
     verify_cluster_communication()
+    apply_deployment()
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")
 
