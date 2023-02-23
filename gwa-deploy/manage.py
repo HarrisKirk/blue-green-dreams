@@ -56,6 +56,14 @@ def apply_deployment():
     logging.info(f"kubectl deployment OK")
     return
 
+def apply_service():
+    cmd = ["kubectl", "--output=json", "apply", "-f", "resources/service.yaml"]
+    output = execute_sh(cmd)
+    json_object = json.loads(output)
+    logging.debug(f"json ==> {json_object}")
+    logging.info(f"kubectl service OK")
+    return
+
 
 def create_cluster(k8s_env):
     """Create a K8S cluster"""
@@ -105,6 +113,7 @@ def verify_deployment(k8s_env):
     write_kubeconfig(kubeconfig)
     verify_cluster_communication()
     apply_deployment()
+    apply_service()
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")
 
