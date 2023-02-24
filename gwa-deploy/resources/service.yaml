@@ -5,8 +5,10 @@ metadata:
   labels:
     app: gwa
 spec:
+  type: LoadBalancer
   ports:
-  - port: 80
+  - port: 8080
+    nodePort: 30050
     protocol: TCP
   selector:
     app: gwa
