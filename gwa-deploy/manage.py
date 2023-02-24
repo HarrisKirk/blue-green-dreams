@@ -114,8 +114,8 @@ def verify_deployment(k8s_env):
     verify_cluster_communication()
     apply_deployment()
     apply_service()
-    # delete_cluster(cluster_id)
-    # logging.info(f"Cluster id '{cluster_id}' was deleted")
+    delete_cluster(cluster_id)
+    logging.info(f"Cluster id '{cluster_id}' was deleted")
 
 
 if __name__ == "__main__":
