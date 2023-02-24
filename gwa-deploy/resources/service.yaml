@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: gwa
   labels:
-    run: gwa
+    app: gwa
 spec:
   ports:
   - port: 80
     protocol: TCP
   selector:
-    run: gwa
+    app: gwa
 
