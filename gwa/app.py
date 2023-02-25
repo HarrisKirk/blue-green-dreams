@@ -13,10 +13,8 @@ def create_app():
     @app.route("/")
     def index():
         """
-        Render a Hello World response.
-
         :return: Flask response
         """
-        return f"Hello World! + {datetime.datetime.now()}"
+        return f"The Richmond weather is great on {datetime.datetime.now()}!"
 
     return app

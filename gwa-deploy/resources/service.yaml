@@ -7,7 +7,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 8080
+  - port: 8000
     nodePort: 30050
     protocol: TCP
   selector:

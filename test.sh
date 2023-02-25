@@ -15,7 +15,7 @@ if [ $exit_code -ne 0 ]; then
     echo "" 
     exit 1
 fi
-grep --silent "Hello World" $TMP_SITE_OUT
+grep --silent "Richmond" $TMP_SITE_OUT
 exit_code=$?
 if [ $exit_code -ne 0 ]; then
     echo "[ERROR] Invalid ~/site result"

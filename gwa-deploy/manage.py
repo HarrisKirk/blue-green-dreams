@@ -13,7 +13,7 @@ from retry import retry
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-    level=logging.DEBUG,
+    level=logging.INFO,
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
@@ -63,6 +63,16 @@ def apply_service():
     logging.debug(f"json ==> {json_object}")
     logging.info(f"kubectl service OK")
     return
+
+@retry(tries=5, delay=10, logger=logging.getLogger())
+def get_ingress_ip():
+    cmd = ["kubectl", "--output=json", "get", "svc", "gwa"]
+    output = execute_sh(cmd)
+    json_object = json.loads(output)
+    logging.debug(f"json ==> {json_object}")
+    ingress_ip = json_object["status"]["loadBalancer"]["ingress"][0]["ip"]
+    logging.info(f"Load Balance Ingress is: {ingress_ip}")
+    return ingress_ip
 
 
 def create_cluster(k8s_env):
@@ -114,8 +124,10 @@ def verify_deployment(k8s_env):
     verify_cluster_communication()
     apply_deployment()
     apply_service()
-    delete_cluster(cluster_id)
-    logging.info(f"Cluster id '{cluster_id}' was deleted")
+    time.sleep(10)
+    ingress_ip = get_ingress_ip()
+    # delete_cluster(cluster_id)
+    # logging.info(f"Cluster id '{cluster_id}' was deleted")
 
 
 if __name__ == "__main__":
