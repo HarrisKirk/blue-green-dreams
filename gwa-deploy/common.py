@@ -20,9 +20,8 @@ def execute_cli(cmd):
             logging.debug(json.dumps(json_object, indent=2))
             return json_object
     else:
-        err_parts = completed_process.stderr.decode().split("\n")
-        json_object = json.loads(err_parts[1])
-        logging.exception(f"linode-cli returned stderr {json.dumps(json_object, indent=2)}")
+        logging.debug(completed_process.stdout.decode())
+        logging.debug(completed_process.stderr.decode())
         raise Exception()
 
 
