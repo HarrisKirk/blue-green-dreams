@@ -31,7 +31,7 @@ _push: ## Push application image to dockerhub
 test: build ## Test the gwa app  
 	./test.sh
 
-deploy_dev: build_deploy ## Test the code to deploy infrastructure
+deploy_dev: build build_deploy ## Test the code to deploy infrastructure
 	docker container run $(DOCKER_ENV_STRING) -it --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) python manage.py gwa_dev
 
 deploy_test: build_deploy ## Test the code to deploy infrastructure

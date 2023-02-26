@@ -9,11 +9,13 @@ import json
 import sys  
 import os
 from retry import retry
+import requests
+
 
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-    level=logging.INFO,
+    level=logging.DEBUG,
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
@@ -114,6 +116,15 @@ def write_kubeconfig(kubeconfig):
         file.write(kubeconfig)
     return
 
+def deployment_smoke_test(ingress_ip):
+    smoke_test_url = f"http://{ingress_ip}:8000"
+    logging.debug(f"Get of {smoke_test_url}")
+    response = requests.get(smoke_test_url)
+    logging.debug(f"Response: {response.text}")
+    if 'Richmond' not in response.text:
+        raise Exception("'Richmond not found on the index page'")
+    logging.info( "[OK] Site smoke test passes")
+    return
 
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
@@ -126,8 +137,10 @@ def verify_deployment(k8s_env):
     apply_service()
     time.sleep(10)
     ingress_ip = get_ingress_ip()
-    # delete_cluster(cluster_id)
-    # logging.info(f"Cluster id '{cluster_id}' was deleted")
+    time.sleep(30)
+    deployment_smoke_test(ingress_ip)
+    delete_cluster(cluster_id)
+    logging.info(f"Cluster id '{cluster_id}' was deleted")
 
 
 if __name__ == "__main__":
