@@ -101,7 +101,10 @@ def create_cluster(k8s_env):
 
 
 def delete_cluster(cluster_id):
-    """Delete a K8S cluster"""
+    """Delete a K8S cluster, starting with service"""
+    cmd = ["kubectl", "delete", "svc", "gwa"]
+    execute_sh(cmd)
+
     cmd = ["linode-cli", "lke", "cluster-delete", cluster_id]
     json_object = execute_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
