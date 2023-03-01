@@ -140,7 +140,7 @@ def verify_deployment(k8s_env):
     apply_service()
     time.sleep(10)
     ingress_ip = get_ingress_ip()
-    time.sleep(30)
+    time.sleep(60)
     deployment_smoke_test(ingress_ip)
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")
