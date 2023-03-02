@@ -138,7 +138,7 @@ def verify_deployment(k8s_env):
     verify_cluster_communication()
     apply_deployment()
     apply_service()
-    time.sleep(10)
+    time.sleep(60)
     ingress_ip = get_ingress_ip()
     time.sleep(60)
     deployment_smoke_test(ingress_ip)
