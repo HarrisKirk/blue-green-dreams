@@ -142,32 +142,11 @@ def verify_deployment(k8s_env):
     ingress_ip = get_ingress_ip()
     time.sleep(60)
     deployment_smoke_test(ingress_ip)
-
-def install_argo_cd():
-    cmd = ["kubectl", "--output=json", "create", "namespace", "argocd"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    logging.debug(f"json ==> {json_object}")
-    logging.info(f"OK: argocd namespace created")
-
-    cmd = ["kubectl", "--output=json", "apply", "-n", "argocd", "-f", "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    logging.debug(f"json ==> {json_object}")
-    logging.info(f"OK: argocd install completed")
-
-    cmd = ["kubectl", "--output=json", "--namespace", "argocd", "get", "all"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    logging.debug(f"json ==> {json_object}")
-    logging.info(f"OK: argocd installation verified")
+    delete_cluster(cluster_id)
+    logging.info(f"Cluster id '{cluster_id}' was deleted")
 
 
 if __name__ == "__main__":
     k8s_env = sys.argv[1]
     logging.info(f"Creating k8s environment '{k8s_env}'")
-    verify_deployment(k8s_env)
-    install_argo_cd()
-    delete_cluster(cluster_id)
-    logging.info(f"Cluster id '{cluster_id}' was deleted")
-
+    verify_deployment(k8s_env)    
