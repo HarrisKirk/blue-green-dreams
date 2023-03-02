@@ -142,6 +142,7 @@ def verify_deployment(k8s_env):
     ingress_ip = get_ingress_ip()
     time.sleep(60)
     deployment_smoke_test(ingress_ip)
+    return cluster_id
 
 def install_argo_cd():
     cmd = ["kubectl", "--output=json", "create", "namespace", "argocd"]
@@ -166,7 +167,7 @@ def install_argo_cd():
 if __name__ == "__main__":
     k8s_env = sys.argv[1]
     logging.info(f"Creating k8s environment '{k8s_env}'")
-    verify_deployment(k8s_env)
+    cluster_id = verify_deployment(k8s_env)
     install_argo_cd()
     delete_cluster(cluster_id)
     logging.info(f"Cluster id '{cluster_id}' was deleted")
