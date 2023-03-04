@@ -73,6 +73,8 @@ def get_ingress_ip():
     json_object = json.loads(output)
     logging.debug(f"json ==> {json_object}")
     ingress_ip = json_object["status"]["loadBalancer"]["ingress"][0]["ip"]
+    if not ingress_ip:
+        raise Exception(f"Ingress IP is empty in the returned json")
     logging.info(f"Load Balance Ingress is: {ingress_ip}")
     return ingress_ip
 
@@ -138,7 +140,6 @@ def verify_deployment(k8s_env):
     verify_cluster_communication()
     apply_deployment()
     apply_service()
-    time.sleep(60)
     ingress_ip = get_ingress_ip()
     time.sleep(60)
     deployment_smoke_test(ingress_ip)
