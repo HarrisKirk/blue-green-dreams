@@ -66,7 +66,7 @@ def apply_service():
     logging.info(f"kubectl service OK")
     return
 
-@retry(tries=5, delay=10, logger=logging.getLogger())
+@retry(tries=20, delay=10, logger=logging.getLogger())
 def get_ingress_ip():
     cmd = ["kubectl", "--output=json", "get", "svc", "gwa"]
     output = execute_sh(cmd)
