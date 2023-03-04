@@ -1,6 +1,7 @@
 # good-weather
 A simple web application (for now) whose deployment is fully automated 
-via kubernetes and linode.  It completely builds, deploys, tests and destroys a k8s cluster.
+via kubernetes and linode.  It completely builds, deploys, tests and destroys a k8s cluster.  The application code and deployment code
+are in different docker images.
 
 # Development Environment
 A make target will perform steps below (without pushing to dockerhub)
