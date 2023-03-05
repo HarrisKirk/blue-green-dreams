@@ -15,7 +15,7 @@ import requests
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-    level=logging.DEBUG,
+    level=logging.INFO,
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
@@ -122,14 +122,19 @@ def write_kubeconfig(kubeconfig):
     return
 
 def deployment_smoke_test(ingress_ip):
-    smoke_test_url = f"http://{ingress_ip}:8000"
-    logging.debug(f"Get of {smoke_test_url}")
-    response = requests.get(smoke_test_url)
+    response = wait_for_http_get(ingress_ip)
     logging.debug(f"Response: {response.text}")
     if 'Richmond' not in response.text:
         raise Exception("'Richmond not found on the index page'")
     logging.info( "[OK] Site smoke test passes")
     return
+
+@retry(tries=20, delay=10, logger=logging.getLogger())
+def wait_for_http_get(ingress_ip):
+    smoke_test_url = f"http://{ingress_ip}:8000"
+    logging.debug(f"Get of {smoke_test_url}")
+    return requests.get(smoke_test_url)
+    
 
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
@@ -141,7 +146,6 @@ def verify_deployment(k8s_env):
     apply_deployment()
     apply_service()
     ingress_ip = get_ingress_ip()
-    time.sleep(60)
     deployment_smoke_test(ingress_ip)
     return cluster_id
 
