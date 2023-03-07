@@ -1,7 +1,7 @@
 """
 Manage all aspects of the creation of infrastructure and app deployment
 """
-from common import execute_cli, execute_sh
+from common import execute_linode_cli, execute_sh
 import logging
 import time
 import base64
@@ -32,14 +32,14 @@ def get_kubeconfig(cluster_id):
         "kubeconfig-view",
         cluster_id,
     ]
-    json_object = execute_cli(cmd)
+    json_object = execute_linode_cli(cmd)
     base_64_kubeconfig = json_object[0]["kubeconfig"]
     logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
     return base64.b64decode(base_64_kubeconfig).decode("ascii")
 
 
 @retry(tries=60, delay=30, logger=logging.getLogger())
-def verify_cluster_communication():
+def kubectl_get_nodes():
     # Verify kubectl is communicating with cluster
     cmd = ["kubectl", "--output=json", "get", "nodes"]
     output = execute_sh(cmd)
@@ -55,7 +55,7 @@ def apply_deployment():
     output = execute_sh(cmd)
     json_object = json.loads(output)
     logging.debug(f"json ==> {json_object}")
-    logging.info(f"kubectl deployment OK")
+    logging.info(f"kubectl deployment applied OK")
     return
 
 def apply_service():
@@ -63,7 +63,7 @@ def apply_service():
     output = execute_sh(cmd)
     json_object = json.loads(output)
     logging.debug(f"json ==> {json_object}")
-    logging.info(f"kubectl service OK")
+    logging.info(f"kubectl service applied OK")
     return
 
 @retry(tries=20, delay=10, logger=logging.getLogger())
@@ -97,7 +97,7 @@ def create_cluster(k8s_env):
         KUBERNETES_NODE_COUNT,
         "--json",
     ]
-    json_object = execute_cli(cmd)
+    json_object = execute_linode_cli(cmd)
     cluster_id = json_object[0]["id"]
     return str(cluster_id)
 
@@ -108,7 +108,7 @@ def delete_cluster(cluster_id):
     execute_sh(cmd)
 
     cmd = ["linode-cli", "lke", "cluster-delete", cluster_id]
-    json_object = execute_cli(cmd)
+    json_object = execute_linode_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
     return
 
@@ -142,7 +142,7 @@ def verify_deployment(k8s_env):
     kubeconfig = get_kubeconfig(cluster_id)
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
-    verify_cluster_communication()
+    kubectl_get_nodes()
     apply_deployment()
     apply_service()
     ingress_ip = get_ingress_ip()

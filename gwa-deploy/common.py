@@ -6,7 +6,7 @@ import json
 import logging
 
 
-def execute_cli(cmd):
+def execute_linode_cli(cmd):
     """Run a command.   Assume the command is a linode-cli command and process error accordingly"""
     logging.debug(" ".join(cmd))
     completed_process = subprocess.run(cmd, cwd=".", check=False, shell=False, capture_output=True)
@@ -29,11 +29,10 @@ def execute_sh(cmd):
     """Execute local shell command within the docker container"""
     logging.debug(" ".join(cmd))
     p = subprocess.run(cmd, cwd=".", check=False, shell=False, capture_output=True)
-    if p.returncode == 0:
-        output = p.stdout.decode().rstrip()
-        logging.debug(output)
-    else:
-        logging.debug(completed_process.stdout.decode())
+    stdout = p.stdout.decode().rstrip()
+    logging.debug(stdout)
+    if p.returncode != 0:
+        logging.debug(stdout)
         logging.debug(completed_process.stderr.decode())
         raise Exception()
-    return output
+    return stdout
