@@ -9,6 +9,7 @@ WORKDIR $INSTALL_PATH
 COPY requirements_deploy.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --upgrade
+RUN pip install --upgrade linode-cli
 RUN pip install black
 
 # Download kubectl for working with the k8s cluster
