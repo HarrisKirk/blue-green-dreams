@@ -28,10 +28,10 @@ def execute_linode_cli(cmd):
 def execute_sh(cmd):
     """Execute local shell command within the docker container"""
     logging.debug(" ".join(cmd))
-    p = subprocess.run(cmd, cwd=".", check=False, shell=False, capture_output=True)
-    stdout = p.stdout.decode().rstrip()
+    completed_process = subprocess.run(cmd, cwd=".", check=False, shell=False, capture_output=True)
+    stdout = completed_process.stdout.decode().rstrip()
     logging.debug(stdout)
-    if p.returncode != 0:
+    if completed_process.returncode != 0:
         logging.debug(stdout)
         logging.debug(completed_process.stderr.decode())
         raise Exception()
