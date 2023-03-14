@@ -21,6 +21,7 @@ logging.basicConfig(
 
 KUBERNETES_VERSION = "1.25"
 KUBERNETES_NODE_COUNT = "2"
+WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN', 'WEATHER_API_TOKEN_missing')
 
 
 @retry(tries=60, delay=30, logger=logging.getLogger())
@@ -135,6 +136,10 @@ def wait_for_http_get(ingress_ip):
     logging.debug(f"Get of {smoke_test_url}")
     return requests.get(smoke_test_url)
     
+def create_secrets():
+    """Create k8s secret for the api key etc"""
+    cmd = ["kubectl", "create", "secret", "generic", "gws-secret", f"--from-literal=WEATHER_API_TOKEN={WEATHER_API_TOKEN}"]
+    execute_sh(cmd)    
 
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
@@ -145,6 +150,7 @@ def verify_deployment(k8s_env):
     kubectl_get_nodes()
     apply_deployment()
     apply_service()
+    create_secrets()
     ingress_ip = get_ingress_ip()
     deployment_smoke_test(ingress_ip)
     return cluster_id
