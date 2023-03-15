@@ -15,13 +15,13 @@ import requests
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-    level=logging.INFO,
+    level=logging.DEBUG,
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
 KUBERNETES_VERSION = "1.25"
 KUBERNETES_NODE_COUNT = "2"
-WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN', 'WEATHER_API_TOKEN_missing')
+WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN')
 
 
 @retry(tries=60, delay=30, logger=logging.getLogger())
@@ -148,9 +148,9 @@ def verify_deployment(k8s_env):
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
     kubectl_get_nodes()
+    create_secrets()
     apply_deployment()
     apply_service()
-    create_secrets()
     ingress_ip = get_ingress_ip()
     deployment_smoke_test(ingress_ip)
     return cluster_id

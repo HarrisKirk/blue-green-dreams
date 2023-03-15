@@ -1,5 +1,6 @@
 from flask import Flask
 import datetime
+import os
 
 
 def create_app():
@@ -23,7 +24,7 @@ def create_app():
             <h1>It is now {datetime.datetime.now()}</h1>
 
             <p>And the weather is fine in Richmond</p>
-
+            <p>And the api key is '{os.environ.get('WEATHER_API_TOKEN')[0:5]}'</p>
             </body>
             </html>
 

@@ -5,11 +5,12 @@
 TMP_SITE_OUT=/tmp/gwa_site.out
 CONTAINER_NAME="gwa"
 docker container rm -f $CONTAINER_NAME 2> /dev/null
-container_id=$(docker container run --rm -it --name $CONTAINER_NAME --network host --detach cjtkirk1/gwa:latest)
+container_id=$(docker container run -e WEATHER_API_TOKEN --rm -it --name $CONTAINER_NAME --network host --detach cjtkirk1/gwa:latest)
 sleep 2
 rm -f $TMP_SITE_OUT 
 curl --silent -o $TMP_SITE_OUT http://0.0.0.0:8000
 exit_code=$?
+cat $TMP_SITE_OUT
 if [ $exit_code -ne 0 ]; then
     echo "[ERROR] flask server is not responding"
     echo "" 

@@ -17,6 +17,12 @@ spec:
       containers:
       - name: gwa
         image: cjtkirk1/gwa:latest
+        env:
+        - name: WEATHER_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: gws-secret
+              key: WEATHER_API_TOKEN
         ports:
         - containerPort: 80
-        
+
