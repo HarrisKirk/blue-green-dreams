@@ -1,10 +1,12 @@
 import requests
 import datetime
 import json
+import gwa.sample
 
 def get_rendered_site_data(weather_api_key):
     weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/richmond%2C%20va?unitGroup=metric&include=days&key={weather_api_key}&contentType=json"
-    json_string = requests.get(weather_url).text
+    # json_string = requests.get(weather_url).text
+    json_string = gwa.sample.sample_json
     parsed = json.loads(json_string)
     pretty_json_string = json.dumps(parsed, indent=4, sort_keys=True)
     return render(weather_api_key, pretty_json_string)
@@ -21,4 +23,3 @@ def render(weather_api_key, json_string):
         </body>
         </html>
     """    
-
