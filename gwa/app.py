@@ -21,3 +21,4 @@ def create_app():
         return html
 
     return app
+
