@@ -3,10 +3,16 @@ import datetime
 import json
 import gwa.sample
 
+USE_LIVE_DATA = False
+
+def get_weather_json(weather_api_key, use_live_data = True):
+    if use_live_data:
+        weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/richmond%2C%20va?unitGroup=metric&include=days&key={weather_api_key}&contentType=json"
+        return requests.get(weather_url).text
+    return gwa.sample.sample_json
+
 def get_rendered_site_data(weather_api_key):
-    weather_url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/richmond%2C%20va?unitGroup=metric&include=days&key={weather_api_key}&contentType=json"
-    # json_string = requests.get(weather_url).text
-    json_string = gwa.sample.sample_json
+    json_string = get_weather_json(weather_api_key, USE_LIVE_DATA)
     parsed = json.loads(json_string)
     pretty_json_string = json.dumps(parsed, indent=4, sort_keys=True)
     return render(weather_api_key, pretty_json_string)
