@@ -1,7 +1,7 @@
 import requests
-import datetime
 import json
 import gwa.sample
+import gwa.rendering
 
 USE_LIVE_DATA = False
 
@@ -13,19 +13,13 @@ def get_weather_json(weather_api_key, use_live_data = True):
 
 def get_rendered_site_data(weather_api_key):
     json_string = get_weather_json(weather_api_key, USE_LIVE_DATA)
-    parsed = json.loads(json_string)
-    pretty_json_string = json.dumps(parsed, indent=4, sort_keys=True)
-    return render(weather_api_key, pretty_json_string)
+    parsed_json = json.loads(json_string)
+    pretty_json_string = json.dumps(parsed_json, indent=4, sort_keys=True)
+    day_list = get_day_info(parsed_json)
+    return gwa.rendering.render(weather_api_key, pretty_json_string, day_list)
 
-def render(weather_api_key, json_string):
-    return f"""
-        <!DOCTYPE html>
-        <html>
-        <body>
-        <h1>It is now {datetime.datetime.now()}</h1>
-        <p>And the weather is fine in Richmond</p>
-        <p>And the api key is '{weather_api_key[0:5]}'</p>
-        <p>The json string is {json_string}</p>
-        </body>
-        </html>
-    """    
+def get_day_info(parsed_json):
+    days = [dict({"datetime": day['datetime'], 'feelslikemax': day['feelslikemax']}) for day in parsed_json['days'] ]
+    days = [dict({"datetime": '', 'feelslikemax': ''})] + days
+    return days
+
