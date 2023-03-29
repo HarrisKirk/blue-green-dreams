@@ -1,5 +1,4 @@
-
-sample_json = '''{
+sample_json = """{
     "address": "richmond, va",
     "days": [
         {
@@ -664,4 +663,4 @@ sample_json = '''{
     },
     "timezone": "America/New_York",
     "tzoffset": -4.0
-}'''
+}"""

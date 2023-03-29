@@ -6,11 +6,10 @@ import logging
 import time
 import base64
 import json
-import sys  
+import sys
 import os
 from retry import retry
 import requests
-
 
 
 logging.basicConfig(
@@ -21,7 +20,7 @@ logging.basicConfig(
 
 KUBERNETES_VERSION = "1.25"
 KUBERNETES_NODE_COUNT = "2"
-WEATHER_API_TOKEN = os.environ.get('WEATHER_API_TOKEN')
+WEATHER_API_TOKEN = os.environ.get("WEATHER_API_TOKEN")
 
 
 @retry(tries=60, delay=30, logger=logging.getLogger())
@@ -51,6 +50,7 @@ def kubectl_get_nodes():
     logging.info(f"kubectl OK: Retrieved node count: {len(nodes)}")
     return
 
+
 def apply_deployment():
     cmd = ["kubectl", "--output=json", "apply", "-f", "resources/deployment.yaml"]
     output = execute_sh(cmd)
@@ -59,6 +59,7 @@ def apply_deployment():
     logging.info(f"kubectl deployment applied OK")
     return
 
+
 def apply_service():
     cmd = ["kubectl", "--output=json", "apply", "-f", "resources/service.yaml"]
     output = execute_sh(cmd)
@@ -66,6 +67,7 @@ def apply_service():
     logging.debug(f"json ==> {json_object}")
     logging.info(f"kubectl service applied OK")
     return
+
 
 @retry(tries=20, delay=10, logger=logging.getLogger())
 def get_ingress_ip():
@@ -116,31 +118,42 @@ def delete_cluster(cluster_id):
 
 
 def write_kubeconfig(kubeconfig):
-    KUBECONFIG_DIR = os.environ['HOME'] + "/.kube"
+    KUBECONFIG_DIR = os.environ["HOME"] + "/.kube"
     KUBECONFIG_FILE_PATH = KUBECONFIG_DIR + "/config"
     os.mkdir(KUBECONFIG_DIR)
     with open(KUBECONFIG_FILE_PATH, "w") as file:
         file.write(kubeconfig)
     return
 
+
 def deployment_smoke_test(ingress_ip):
     response = wait_for_http_get(ingress_ip)
     logging.debug(f"Response: {response.text}")
-    if 'Richmond' not in response.text:
+    if "Richmond" not in response.text:
         return False
-    logging.info( "[OK] Site smoke test passes")
+    logging.info("[OK] Site smoke test passes")
     return True
+
 
 @retry(tries=20, delay=10, logger=logging.getLogger())
 def wait_for_http_get(ingress_ip):
     smoke_test_url = f"http://{ingress_ip}:8000"
     logging.debug(f"Get of {smoke_test_url}")
     return requests.get(smoke_test_url)
-    
+
+
 def create_secrets():
     """Create k8s secret for the api key etc"""
-    cmd = ["kubectl", "create", "secret", "generic", "gws-secret", f"--from-literal=WEATHER_API_TOKEN={WEATHER_API_TOKEN}"]
-    execute_sh(cmd)    
+    cmd = [
+        "kubectl",
+        "create",
+        "secret",
+        "generic",
+        "gws-secret",
+        f"--from-literal=WEATHER_API_TOKEN={WEATHER_API_TOKEN}",
+    ]
+    execute_sh(cmd)
+
 
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
@@ -155,6 +168,7 @@ def verify_deployment(k8s_env):
     ingress_ip = get_ingress_ip()
     return cluster_id, ingress_ip
 
+
 if __name__ == "__main__":
     k8s_env = sys.argv[1]
     logging.info(f"Creating k8s environment '{k8s_env}'")
@@ -164,6 +178,4 @@ if __name__ == "__main__":
         delete_cluster(cluster_id)
     else:
         delete_cluster(cluster_id)
-        raise Exception("'Richmond not found on the index page'")    
-
-
+        raise Exception("'Richmond not found on the index page'")
