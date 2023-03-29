@@ -3,7 +3,7 @@ import json
 import gwa.sample
 import gwa.rendering
 
-USE_LIVE_DATA = False
+USE_LIVE_DATA = True
 
 def get_weather_json(weather_api_key, use_live_data = True):
     if use_live_data:
