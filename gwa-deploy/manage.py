@@ -111,6 +111,7 @@ def delete_cluster(cluster_id):
     cmd = ["linode-cli", "lke", "cluster-delete", cluster_id]
     json_object = execute_linode_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
+    logging.info(f"Cluster id '{cluster_id}' was deleted")
     return
 
 
@@ -126,9 +127,9 @@ def deployment_smoke_test(ingress_ip):
     response = wait_for_http_get(ingress_ip)
     logging.debug(f"Response: {response.text}")
     if 'Richmond' not in response.text:
-        raise Exception("'Richmond not found on the index page'")
+        return False
     logging.info( "[OK] Site smoke test passes")
-    return
+    return True
 
 @retry(tries=20, delay=10, logger=logging.getLogger())
 def wait_for_http_get(ingress_ip):
@@ -152,13 +153,17 @@ def verify_deployment(k8s_env):
     apply_deployment()
     apply_service()
     ingress_ip = get_ingress_ip()
-    deployment_smoke_test(ingress_ip)
-    return cluster_id
+    return cluster_id, ingress_ip
 
 if __name__ == "__main__":
     k8s_env = sys.argv[1]
     logging.info(f"Creating k8s environment '{k8s_env}'")
-    cluster_id = verify_deployment(k8s_env)
-    delete_cluster(cluster_id)
-    logging.info(f"Cluster id '{cluster_id}' was deleted")
+    cluster_id, ingress_ip = verify_deployment(k8s_env)
+    result = deployment_smoke_test(ingress_ip)
+    if result:
+        delete_cluster(cluster_id)
+    else:
+        delete_cluster(cluster_id)
+        raise Exception("'Richmond not found on the index page'")    
+
 
