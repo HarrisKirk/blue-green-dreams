@@ -2,6 +2,7 @@
 Manage all aspects of the creation of infrastructure and app deployment
 """
 from common import execute_linode_cli, execute_sh
+import kubectl
 import logging
 import time
 import base64
@@ -19,8 +20,6 @@ logging.basicConfig(
 )
 
 KUBERNETES_VERSION = "1.25"
-KUBERNETES_NODE_COUNT = "2"
-WEATHER_API_TOKEN = os.environ.get("WEATHER_API_TOKEN")
 
 
 @retry(tries=60, delay=30, logger=logging.getLogger())
@@ -38,50 +37,6 @@ def get_kubeconfig(cluster_id):
     return base64.b64decode(base_64_kubeconfig).decode("ascii")
 
 
-@retry(tries=60, delay=30, logger=logging.getLogger())
-def kubectl_get_nodes():
-    # Verify kubectl is communicating with cluster
-    cmd = ["kubectl", "--output=json", "get", "nodes"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    nodes = json_object["items"]
-    if len(nodes) != int(KUBERNETES_NODE_COUNT):
-        raise Exception(f"kubectl expected {int(KUBERNETES_NODE_COUNT)} nodes but found {len(nodes)}")
-    logging.info(f"kubectl OK: Retrieved node count: {len(nodes)}")
-    return
-
-
-def apply_deployment():
-    cmd = ["kubectl", "--output=json", "apply", "-f", "resources/deployment.yaml"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    logging.debug(f"json ==> {json_object}")
-    logging.info(f"kubectl deployment applied OK")
-    return
-
-
-def apply_service():
-    cmd = ["kubectl", "--output=json", "apply", "-f", "resources/service.yaml"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    logging.debug(f"json ==> {json_object}")
-    logging.info(f"kubectl service applied OK")
-    return
-
-
-@retry(tries=20, delay=10, logger=logging.getLogger())
-def get_ingress_ip():
-    cmd = ["kubectl", "--output=json", "get", "svc", "gwa"]
-    output = execute_sh(cmd)
-    json_object = json.loads(output)
-    logging.debug(f"json ==> {json_object}")
-    ingress_ip = json_object["status"]["loadBalancer"]["ingress"][0]["ip"]
-    if not ingress_ip:
-        raise Exception(f"Ingress IP is empty in the returned json")
-    logging.info(f"Load Balance Ingress is: {ingress_ip}")
-    return ingress_ip
-
-
 def create_cluster(k8s_env):
     """Create a K8S cluster"""
     cmd = [
@@ -97,7 +52,7 @@ def create_cluster(k8s_env):
         "--k8s_version",
         KUBERNETES_VERSION,
         "--node_pools.count",
-        KUBERNETES_NODE_COUNT,
+        kubectl.KUBERNETES_NODE_COUNT,
         "--json",
     ]
     json_object = execute_linode_cli(cmd)
@@ -106,10 +61,7 @@ def create_cluster(k8s_env):
 
 
 def delete_cluster(cluster_id):
-    """Delete a K8S cluster, starting with service"""
-    cmd = ["kubectl", "delete", "svc", "gwa"]
-    execute_sh(cmd)
-
+    kubectl.delete_service()  # Must delete the NodeBalancer before and in addition to the cluster
     cmd = ["linode-cli", "lke", "cluster-delete", cluster_id]
     json_object = execute_linode_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
@@ -142,30 +94,17 @@ def wait_for_http_get(ingress_ip):
     return requests.get(smoke_test_url)
 
 
-def create_secrets():
-    """Create k8s secret for the api key etc"""
-    cmd = [
-        "kubectl",
-        "create",
-        "secret",
-        "generic",
-        "gws-secret",
-        f"--from-literal=WEATHER_API_TOKEN={WEATHER_API_TOKEN}",
-    ]
-    execute_sh(cmd)
-
-
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
     logging.info(f"Cluster id '{cluster_id}' was created")
     kubeconfig = get_kubeconfig(cluster_id)
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
-    kubectl_get_nodes()
-    create_secrets()
-    apply_deployment()
-    apply_service()
-    ingress_ip = get_ingress_ip()
+    kubectl.get_nodes()
+    kubectl.create_secrets()
+    kubectl.apply_deployment()
+    kubectl.apply_service()
+    ingress_ip = kubectl.get_ingress_ip()
     return cluster_id, ingress_ip
 
 
@@ -174,8 +113,6 @@ if __name__ == "__main__":
     logging.info(f"Creating k8s environment '{k8s_env}'")
     cluster_id, ingress_ip = verify_deployment(k8s_env)
     result = deployment_smoke_test(ingress_ip)
-    if result:
-        delete_cluster(cluster_id)
-    else:
-        delete_cluster(cluster_id)
+    delete_cluster(cluster_id)  # delete cluster to not incur charges
+    if not result:
         raise Exception("'Richmond not found on the index page'")
