@@ -6,16 +6,29 @@ RUN mkdir -p $INSTALL_PATH
 
 WORKDIR $INSTALL_PATH
 
+# Download k8s tools for working with the k8s cluster
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" ;\
+    mv kubectl /bin ;\
+    chmod 775 /bin/kubectl
+RUN curl -LO "https://github.com/helmfile/helmfile/releases/download/v0.152.0/helmfile_0.152.0_linux_amd64.tar.gz" ;\
+    gunzip helmfile_0.152.0_linux_amd64.tar.gz ;\
+    tar -xf helmfile_0.152.0_linux_amd64.tar ;\
+    mv helmfile /usr/local/bin
+RUN curl -LO "https://get.helm.sh/helm-v3.11.3-linux-amd64.tar.gz" ;\
+    gunzip helm-v3.11.3-linux-amd64.tar.gz ;\
+    tar -xf helm-v3.11.3-linux-amd64.tar ;\
+    mv linux-amd64/helm /usr/local/bin 
+RUN helm repo add bitnami https://charts.bitnami.com/bitnami ;\
+    helm repo add argocd https://argoproj.github.io/argo-helm ;\
+    helm repo update
+
+
 COPY requirements_deploy.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --upgrade
 RUN pip install --upgrade linode-cli
 RUN pip install black
 
-# Download kubectl for working with the k8s cluster
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" ;\
-    mv kubectl /bin ;\
-    chmod 775 /bin/kubectl
 
 COPY gwa-deploy .
 

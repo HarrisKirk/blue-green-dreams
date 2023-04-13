@@ -1,0 +1,9 @@
+  values:
+    - installCRDs: true
+      config:
+        rbac:
+          defaultPolicy: 'role'
+          policy.csv: |
+            p, role:unauthorized, *, *, *, deny
+            g, DevOps, role:admin
+            

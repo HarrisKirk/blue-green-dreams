@@ -2,6 +2,7 @@
 Manage all aspects of the creation of infrastructure and app deployment
 """
 from common import execute_linode_cli, execute_sh
+import subprocess
 import kubectl
 import logging
 import time
@@ -93,6 +94,15 @@ def wait_for_http_get(ingress_ip):
     logging.debug(f"Get of {smoke_test_url}")
     return requests.get(smoke_test_url)
 
+def install_argocd():
+    cmd = ["helm", "template"]
+    logging.debug(f"{cmd}")    
+    completed_process = subprocess.run(cmd, cwd="./resources", check=True, shell=True, capture_output=True)
+    with open('./resources/argocd.yaml', "w") as file:
+        file.write(completed_process.stdout.decode())
+    kubectl.apply_argocd()
+    return
+    
 
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
@@ -101,6 +111,7 @@ def verify_deployment(k8s_env):
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
     kubectl.get_nodes()
+    install_argocd()
     kubectl.create_secrets()
     kubectl.apply_deployment()
     kubectl.apply_service()

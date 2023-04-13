@@ -68,3 +68,15 @@ def get_ingress_ip():
         raise Exception(f"Ingress IP is empty in the returned json")
     logging.info(f"Load Balance Ingress is: {ingress_ip}")
     return ingress_ip
+
+def apply_argocd():
+    cmd = ["ls", "-al"]
+    output = execute_sh(cmd)
+
+    cmd = ["kubectl", "create", "namespace", "argocd"]
+    output = execute_sh(cmd)
+
+    # cmd = ["kubectl", "apply", "--namespace=argocd", "--dry-run=server", "-k", "."]
+    # output = execute_sh(cmd, "./resources")
+    return
+
