@@ -1,11 +1,10 @@
 .PHONY: help build
+
 .SILENT: 
 DOCKER_IMAGE_NAME = cjtkirk1/gwa
 DOCKER_IMAGE = $(DOCKER_IMAGE_NAME):latest	
-
 DOCKER_DEPLOY_IMAGE_NAME = cjtkirk1/gwa_deploy
 DOCKER_DEPLOY_IMAGE = $(DOCKER_DEPLOY_IMAGE_NAME):latest
-
 DOCKER_ENV_STRING = -e LINODE_CLI_TOKEN -e LINODE_ROOT_PASSWORD -e WEATHER_API_TOKEN
 
 APP_TAG = `git describe --tags --always`
@@ -41,3 +40,6 @@ format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa $(DOCKER_IMAGE_NAME) black --verbose --line-length=120 /gwa;\
 	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy	 $(DOCKER_DEPLOY_IMAGE_NAME) black --verbose --line-length=120 /gwa-deploy;\
 
+web: build ## Launch a local docker flask site
+	docker container rm -f gwa ;\
+	docker container run -e WEATHER_API_TOKEN --rm -it --name gwa --network host --detach cjtkirk1/gwa:latest ;\
