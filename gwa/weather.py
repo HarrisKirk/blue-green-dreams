@@ -23,7 +23,7 @@ def get_rendered_site_data(weather_api_key):
 
 def get_day_info(parsed_json):
     days = [
-        dict({"datetime": day["datetime"], "feelslikemax": celsius_to_fahrenheit(float(day["feelslikemax"]))})
+        dict({"datetime": day["datetime"], "feelslikemax": round(celsius_to_fahrenheit(float(day["feelslikemax"])))})
         for day in parsed_json["days"]
     ]
     days = [dict({"datetime": "", "feelslikemax": ""})] + days
