@@ -2,6 +2,7 @@ FROM python:3.10.5
 MAINTAINER Harris Kirk <cjtkirk@protonmail.com>
 
 ENV INSTALL_PATH /gwa_deploy
+ENV PATH=.:$PATH
 RUN mkdir -p $INSTALL_PATH
 
 WORKDIR $INSTALL_PATH
@@ -32,3 +33,4 @@ RUN pip install black
 
 COPY gwa-deploy .
 
+ENTRYPOINT ["python", "./infctl"]

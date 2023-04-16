@@ -31,14 +31,14 @@ test: build ## Test the gwa app
 	./test.sh
 
 deploy_dev: build build_deploy ## Test the code to deploy infrastructure
-	docker container run $(DOCKER_ENV_STRING) -it --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) python manage.py gwa_dev
+	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) gwa_dev
 
 deploy_test: build_deploy ## Test the code to deploy infrastructure
-	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) python manage.py gwa_test
+	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) gwa_test
 
 format: ## format the python code consistently
-	docker container run -v $(PWD)/gwa:/gwa $(DOCKER_IMAGE_NAME) black --verbose --line-length=120 /gwa;\
-	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy	 $(DOCKER_DEPLOY_IMAGE_NAME) black --verbose --line-length=120 /gwa-deploy;\
+	docker container run -v $(PWD)/gwa:/gwa --entrypoint "black" $(DOCKER_IMAGE_NAME) --verbose --line-length=120 /gwa
+	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy --entrypoint "black" $(DOCKER_DEPLOY_IMAGE_NAME) --verbose --line-length=120 /gwa-deploy
 
 web: build ## Launch a local docker flask site
 	docker container rm -f gwa ;\

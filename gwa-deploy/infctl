@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Manage all aspects of the creation of infrastructure and app deployment
 """
@@ -12,6 +13,7 @@ import sys
 import os
 from retry import retry
 import requests
+import typer
 
 
 logging.basicConfig(
@@ -94,16 +96,15 @@ def wait_for_http_get(ingress_ip):
     logging.debug(f"Get of {smoke_test_url}")
     return requests.get(smoke_test_url)
 
-
 def install_argocd():
     cmd = ["helm", "template"]
-    logging.debug(f"{cmd}")
+    logging.debug(f"{cmd}")    
     completed_process = subprocess.run(cmd, cwd="./resources", check=True, shell=True, capture_output=True)
-    with open("./resources/argocd.yaml", "w") as file:
+    with open('./resources/argocd.yaml', "w") as file:
         file.write(completed_process.stdout.decode())
     kubectl.apply_argocd()
     return
-
+    
 
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
@@ -120,11 +121,15 @@ def verify_deployment(k8s_env):
     return cluster_id, ingress_ip
 
 
-if __name__ == "__main__":
-    k8s_env = sys.argv[1]
+def main(env: str):
+    k8s_env = env
     logging.info(f"Creating k8s environment '{k8s_env}'")
     cluster_id, ingress_ip = verify_deployment(k8s_env)
     result = deployment_smoke_test(ingress_ip)
     delete_cluster(cluster_id)  # delete cluster to not incur charges
     if not result:
         raise Exception("'Richmond not found on the index page'")
+
+
+if __name__ == "__main__":
+    typer.run(main)
