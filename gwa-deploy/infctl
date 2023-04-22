@@ -46,6 +46,8 @@ def create_cluster(k8s_env):
         "linode-cli",
         "lke",
         "cluster-create",
+        "--tags",
+        k8s_env,
         "--label",
         k8s_env,
         "--region",
