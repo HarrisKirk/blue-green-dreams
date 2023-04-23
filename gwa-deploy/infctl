@@ -15,7 +15,6 @@ from retry import retry
 import requests
 import typer
 
-app = typer.Typer()
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
@@ -123,8 +122,8 @@ def verify_deployment(k8s_env):
     ingress_ip = kubectl.get_ingress_ip()
     return cluster_id, ingress_ip
 
-@app.command()
-def deploy(env: str):
+
+def main(env: str):
     k8s_env = env
     logging.info(f"Creating k8s environment '{k8s_env}'")
     cluster_id, ingress_ip = verify_deployment(k8s_env)
@@ -132,11 +131,7 @@ def deploy(env: str):
     delete_cluster(cluster_id)  # delete cluster to not incur charges
     if not result:
         raise Exception("'Richmond not found on the index page'")
-    return
 
-@app.command()
-def dummy(tag: str):
-    pass
 
 if __name__ == "__main__":
-    app()
+    typer.run(main)
