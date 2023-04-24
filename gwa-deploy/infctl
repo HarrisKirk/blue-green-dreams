@@ -51,7 +51,7 @@ def create_cluster(k8s_env):
         "--tags",
         k8s_env,
         "--label",
-        k8s_env,
+        f"Kubernetes cluster for {k8s_env}",
         "--region",
         "us-east",
         "--node_pools.type",
