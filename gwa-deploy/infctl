@@ -23,7 +23,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
-KUBERNETES_VERSION = "1.25"
+KUBERNETES_VERSION = "1.26"
 
 
 @retry(tries=60, delay=30)
