@@ -8,7 +8,7 @@ WEATHER_API_TOKEN = os.environ.get("WEATHER_API_TOKEN")
 KUBERNETES_NODE_COUNT = "2"
 
 
-@retry(tries=60, delay=30, logger=logging.getLogger())
+@retry(tries=60, delay=30)
 def get_nodes():
     # Verify kubectl is communicating with cluster
     cmd = ["kubectl", "--output=json", "get", "nodes"]
@@ -57,7 +57,7 @@ def create_secrets():
     execute_sh(cmd)
 
 
-@retry(tries=20, delay=10, logger=logging.getLogger())
+@retry(tries=20, delay=10)
 def get_ingress_ip():
     cmd = ["kubectl", "--output=json", "get", "svc", "gwa"]
     output = execute_sh(cmd)
