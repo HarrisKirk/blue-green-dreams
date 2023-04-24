@@ -1,4 +1,7 @@
-# good-weather
+# blue-green-dream
+
+![Architecture Vision](blue-green-arch.png)
+
 A trivial web application (for now) whose deployment is fully automated 
 via kubernetes and linode.  
 
