@@ -3,6 +3,7 @@
 Manage all aspects of the creation of infrastructure and app deployment
 """
 from common import execute_linode_cli, execute_sh
+import linodeapi
 import subprocess
 import kubectl
 import logging
@@ -131,6 +132,8 @@ def deploy(env: str):
     logging.info(f"Creating k8s environment '{k8s_env}'")
     cluster_id, ingress_ip = verify_deployment(k8s_env)
     result = deployment_smoke_test(ingress_ip)
+    account_object_count = linodeapi.get_account_info(k8s_env)
+    logging.info(f"Current account object count that have tag '{k8s_env}': {account_object_count}")
     delete_cluster(cluster_id)  # delete cluster to not incur charges
     if not result:
         raise Exception("'Richmond not found on the index page'")

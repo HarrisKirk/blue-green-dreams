@@ -2,3 +2,5 @@
 linode-cli
 retry
 typer[all]
+requests
+
