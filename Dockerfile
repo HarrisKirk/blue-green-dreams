@@ -11,7 +11,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --upgrade
 RUN pip install black
 
-COPY . .
+COPY ./gwa ./gwa
 
 CMD gunicorn -b 0.0.0.0:8000 --access-logfile - "gwa.app:create_app()"
 

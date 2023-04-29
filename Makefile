@@ -36,6 +36,9 @@ deploy_dev: build build_deploy ## Test the code to deploy infrastructure
 deploy_test: build_deploy ## Test the code to deploy infrastructure
 	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) deploy gwa_test
 
+zx: build ## test the app image
+	docker container run -it $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host --entrypoint "bash" $(DOCKER_IMAGE) 
+
 format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa --entrypoint "black" $(DOCKER_IMAGE_NAME) --verbose --line-length=120 /gwa
 	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy --entrypoint "black" $(DOCKER_DEPLOY_IMAGE_NAME) --verbose --line-length=120 /gwa-deploy
