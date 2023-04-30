@@ -23,7 +23,11 @@ def get_nodes():
 @retry(tries=5, delay=10)
 def apply_deployment():
     cmd = ["kubectl", "--output=json", "apply", "-f", "resources/deployment.yaml"]
-    output = execute_sh(cmd)
+    output = None
+    try:
+        output = execute_sh(cmd)
+    except Exception as e:
+        raise Exception(f"retrying {cmd}")
     json_object = json.loads(output)
     logging.debug(f"json ==> {json_object}")
     logging.info(f"kubectl deployment applied OK")
