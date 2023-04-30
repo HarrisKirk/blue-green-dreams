@@ -80,9 +80,13 @@ def delete_cluster(cluster_id):
 def write_kubeconfig(kubeconfig):
     KUBECONFIG_DIR = os.environ["HOME"] + "/.kube"
     KUBECONFIG_FILE_PATH = KUBECONFIG_DIR + "/config"
-    os.mkdir(KUBECONFIG_DIR)
+    try:
+        os.mkdir(KUBECONFIG_DIR)
+    except FileExistsError:
+        pass
     with open(KUBECONFIG_FILE_PATH, "w") as file:
         file.write(kubeconfig)
+    logging.info(f"kubernetes config file written: {KUBECONFIG_FILE_PATH}")
     return
 
 
@@ -136,6 +140,8 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     logging.info(f"Current account has {account_object_count} linodes")
     if not keep:
         delete_cluster(cluster_id)  # delete cluster to not incur charges
+    else:
+        logging.info(f"Cluster ID {cluster_id} is running and incurring charges!")
     if not tests_pass:
         raise Exception("ERROR: Tests of index.html page failed")
     return

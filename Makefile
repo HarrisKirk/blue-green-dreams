@@ -6,6 +6,7 @@ DOCKER_IMAGE = $(DOCKER_IMAGE_NAME):latest
 DOCKER_DEPLOY_IMAGE_NAME = cjtkirk1/gwa_deploy
 DOCKER_DEPLOY_IMAGE = $(DOCKER_DEPLOY_IMAGE_NAME):latest
 DOCKER_ENV_STRING = -e LINODE_CLI_TOKEN -e LINODE_ROOT_PASSWORD -e WEATHER_API_TOKEN
+DOCKER_DEPLOY_VOLUMES = -v ~/.kube:/root/.kube
 
 APP_TAG = `git describe --tags --always`
 
@@ -42,4 +43,4 @@ web: build ## Launch a local docker flask site
 	docker container run -e WEATHER_API_TOKEN --rm -it --name gwa --network host --detach cjtkirk1/gwa:latest ;\
 
 alias: ## Echo an alias to run bgctl from docker
-	echo "alias bgdctl='docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME)'"
+	echo "alias bgdctl='docker container run $(DOCKER_DEPLOY_VOLUMES) $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME)'"
