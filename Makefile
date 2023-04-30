@@ -30,14 +30,8 @@ _push: ## Push application image to dockerhub
 test: build ## Test the gwa app  
 	./test.sh
 
-deploy_dev: build build_deploy ## Test the code to deploy infrastructure
-	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) deploy gwa_dev
-
 deploy_test: build_deploy ## Test the code to deploy infrastructure
 	docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) deploy gwa_test
-
-zx: build ## test the app image
-	docker container run -it $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host --entrypoint "bash" $(DOCKER_IMAGE) 
 
 format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa --entrypoint "black" $(DOCKER_IMAGE_NAME) --verbose --line-length=120 /gwa
@@ -46,3 +40,6 @@ format: ## format the python code consistently
 web: build ## Launch a local docker flask site
 	docker container rm -f gwa ;\
 	docker container run -e WEATHER_API_TOKEN --rm -it --name gwa --network host --detach cjtkirk1/gwa:latest ;\
+
+alias: ## Echo an alias to run bgctl from docker
+	echo "alias bgdctl='docker container run $(DOCKER_ENV_STRING) --rm --name gwa_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME)'"
