@@ -20,7 +20,7 @@ def get_nodes():
     logging.info(f"kubectl OK: Retrieved node count: {len(nodes)}")
     return
 
-
+@retry(tries=5, delay=10)
 def apply_deployment():
     cmd = ["kubectl", "--output=json", "apply", "-f", "resources/deployment.yaml"]
     output = execute_sh(cmd)
