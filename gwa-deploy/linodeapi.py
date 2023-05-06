@@ -4,7 +4,7 @@ import json
 import logging
 
 
-def get_account_info(tag):
+def get_account_info():
     token = os.environ.get("LINODE_CLI_TOKEN")
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     url = f"https://api.linode.com/v4/linode/instances"

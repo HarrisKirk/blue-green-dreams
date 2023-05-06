@@ -143,7 +143,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     logging.info(f"Creating k8s environment '{k8s_env}' with keep={keep}")
     cluster_id, ingress_ip = verify_deployment(k8s_env)
     tests_pass = deployment_smoke_test(ingress_ip)
-    account_object_count = len(linodeapi.get_account_info(k8s_env))
+    account_object_count = len(linodeapi.get_account_info())
     logging.info(f"Current account has {account_object_count} linodes")
     if not keep:
         delete_cluster(cluster_id)  # delete cluster to not incur charges
@@ -154,8 +154,9 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     return
 
 @app.command()
-def dummy(tag: str):
-    pass
+def list_instances():
+    pretty_data = json.dumps(linodeapi.get_account_info(), indent=4)    
+    logging.info(f"Listing artifacts {pretty_data}")
 
 if __name__ == "__main__":
     app()
