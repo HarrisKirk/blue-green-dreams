@@ -27,7 +27,7 @@ logging.basicConfig(
 KUBERNETES_VERSION = "1.26"
 
 
-@retry(tries=60, delay=30)
+@retry(tries=50, delay=30)
 def get_kubeconfig(cluster_id):
     cmd = [
         "linode-cli",
@@ -119,7 +119,14 @@ def install_argocd():
 def verify_deployment(k8s_env):
     cluster_id = create_cluster(k8s_env)
     logging.info(f"Cluster id '{cluster_id}' was created")
-    kubeconfig = get_kubeconfig(cluster_id)
+    logging.info(f"Waiting to receive kubeconfig...")
+    try:
+        kubeconfig = get_kubeconfig(cluster_id)
+    except Exception as e:
+        logging.error(f"Waiting period for linode to provide the kubeconfig has expired.  Deleting cluster '{cluster_id}' and aborting.")
+        logging.exception("An exception occurred: %s", str(e))
+        delete_cluster(cluster_id)  # delete cluster to not incur charges
+        sys.exit(2) # 2 is linode timeout
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)
     kubectl.get_nodes()
