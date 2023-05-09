@@ -154,9 +154,11 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     return
 
 @app.command()
-def ls():
-    k8s_nodes = linodeapi.get_k8s_nodes()
-    logging.info(f"Number of lke linodes: {len(k8s_nodes)}")
+def ls_clusters(
+    tag: str
+):
+    cluster_id = linodeapi.get_cluster_id(tag)
+    logging.info(f"Cluster ID with tag '{tag}': {cluster_id}")
 
 if __name__ == "__main__":
     app()
