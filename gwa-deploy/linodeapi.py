@@ -3,18 +3,12 @@ import os
 import json
 import logging
 
+token = os.environ.get("LINODE_CLI_TOKEN")
+headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
 
 def get_k8s_nodes():
-    token = os.environ.get("LINODE_CLI_TOKEN")
-    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     url = f"https://api.linode.com/v4/linode/instances"
-    logging.debug(f"REST call to {url}")
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        return f"Error: {response.status_code} - {response.text}"
-    parsed_json = json.loads(response.text)
-    pretty_json_string = json.dumps(parsed_json, indent=4, sort_keys=True)
-    logging.debug(pretty_json_string)
+    parsed_json = _invoke_rest_call(url)
     all_linodes = parsed_json["data"]
     label_prefix_lke = "lke"
     k8s_nodes = [linode for linode in all_linodes if linode["label"].startswith(label_prefix_lke)]
@@ -22,16 +16,8 @@ def get_k8s_nodes():
 
 
 def get_cluster_id(tag: str):
-    token = os.environ.get("LINODE_CLI_TOKEN")
-    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
     url = f"https://api.linode.com/v4/lke/clusters"
-    logging.debug(f"REST call to {url}")
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        return f"Error: {response.status_code} - {response.text}"
-    parsed_json = json.loads(response.text)
-    pretty_json_string = json.dumps(parsed_json, indent=4, sort_keys=True)
-    logging.debug(pretty_json_string)
+    parsed_json = _invoke_rest_call(url)
     data = parsed_json["data"]
     clusters = [cluster for cluster in data if tag in cluster["tags"]]
     if len(clusters) > 1:
@@ -40,3 +26,15 @@ def get_cluster_id(tag: str):
         return None
     cluster_id = clusters[0]["id"]
     return cluster_id
+
+def _invoke_rest_call(url: str):
+    logging.debug(f"REST call to {url}")
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return f"Error: {response.status_code} - {response.text}"
+    parsed_json = json.loads(response.text)
+    pretty_json_string = json.dumps(parsed_json, indent=4, sort_keys=True)
+    logging.debug(pretty_json_string)
+    return parsed_json
+
+    
