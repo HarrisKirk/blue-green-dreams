@@ -14,6 +14,12 @@ def get_k8s_nodes():
     k8s_nodes = [linode for linode in all_linodes if linode["label"].startswith(label_prefix_lke)]
     return k8s_nodes
 
+def get_all_clusters():
+    url = f"https://api.linode.com/v4/lke/clusters"
+    parsed_json = _invoke_rest_call(url)
+    data = parsed_json["data"]
+    clusters = [{'id': cluster['id'], 'tags': cluster['tags']} for cluster in data ]
+    return clusters
 
 def get_cluster_id(tag: str):
     url = f"https://api.linode.com/v4/lke/clusters"
