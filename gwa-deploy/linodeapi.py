@@ -43,4 +43,3 @@ def _invoke_rest_call(url: str):
     logging.debug(pretty_json_string)
     return parsed_json
 
-    
