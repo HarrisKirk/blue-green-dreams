@@ -21,13 +21,13 @@ def get_all_clusters():
     clusters = [{'id': cluster['id'], 'tags': cluster['tags']} for cluster in data ]
     return clusters
 
-def get_cluster_id(tag: str):
+def get_cluster_id(env: str):
     url = f"https://api.linode.com/v4/lke/clusters"
     parsed_json = _invoke_rest_call(url)
     data = parsed_json["data"]
-    clusters = [cluster for cluster in data if tag in cluster["tags"]]
+    clusters = [cluster for cluster in data if f"env_{env}" in cluster["tags"]]
     if len(clusters) > 1:
-        logging.exception(f"List of clusters with tag {tag} exceeds 1??")
+        logging.exception(f"List of clusters with tag 'env_{env}' exceeds 1??")
     if clusters == []:
         return None
     cluster_id = clusters[0]["id"]

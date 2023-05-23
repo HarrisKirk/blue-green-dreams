@@ -33,7 +33,7 @@ test: build ## Test the $(PROJECT_ACRONYM) app
 	./test.sh
 
 deploy_test: build_deploy ## Test the code to deploy infrastructure
-	docker container run $(DOCKER_ENV_STRING) --rm --name $(PROJECT_ACRONYM)_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) deploy $(PROJECT_ACRONYM)_test
+	docker container run $(DOCKER_ENV_STRING) --rm --name $(PROJECT_ACRONYM)_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) deploy test
 
 format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa --entrypoint "black" $(DOCKER_IMAGE_NAME) --verbose --line-length=120 /gwa

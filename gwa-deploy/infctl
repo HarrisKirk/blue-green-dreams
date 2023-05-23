@@ -50,7 +50,7 @@ def create_cluster(k8s_env):
         "lke",
         "cluster-create",
         "--tags",
-        k8s_env,
+        f"env_{k8s_env}", # add tag for 'project_bgd' later
         "--label",
         f"Kubernetes cluster for {k8s_env}",
         "--region",
@@ -157,10 +157,10 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
 
 @app.command()
 def ls_clusters(
-    tag: str
+    env: str
 ):
-    cluster_id = linodeapi.get_cluster_id(tag)
-    logging.info(f"Cluster ID with tag '{tag}': {cluster_id}")
+    cluster_id = linodeapi.get_cluster_id(env)
+    logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")
 
 if __name__ == "__main__":
     app()
