@@ -29,10 +29,13 @@ _push: ## Push application image to dockerhub
 	docker image push $(DOCKER_IMAGE_NAME):latest
 	docker image push $(DOCKER_IMAGE_NAME):$(APP_TAG)
 
-test: build ## Test the $(PROJECT_ACRONYM) app  
+test_deploy_unit: build_deploy ## run all unit tests
+	docker container run $(DOCKER_ENV_STRING) --rm --name $(PROJECT_ACRONYM)_deploy --network host --entrypoint "python" $(DOCKER_DEPLOY_IMAGE_NAME) -m unittest test/test_basic.py ;\
+
+test: test_unit ## Test the $(PROJECT_ACRONYM) app  
 	./test.sh
 
-deploy_test: build_deploy ## Test the code to deploy infrastructure
+deploy_test: test_deploy_unit ## Deploy infrastructure
 	docker container run $(DOCKER_ENV_STRING) --rm --name $(PROJECT_ACRONYM)_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME) deploy test
 
 format: ## format the python code consistently
