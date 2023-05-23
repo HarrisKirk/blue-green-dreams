@@ -32,7 +32,7 @@ _push: ## Push application image to dockerhub
 test_deploy_unit: build_deploy ## run all unit tests
 	docker container run $(DOCKER_ENV_STRING) --rm --name $(PROJECT_ACRONYM)_deploy --network host --entrypoint "python" $(DOCKER_DEPLOY_IMAGE_NAME) -m unittest test/test_basic.py ;\
 
-test: test_unit ## Test the $(PROJECT_ACRONYM) app  
+test: ## Test the $(PROJECT_ACRONYM) app  
 	./test.sh
 
 deploy_test: test_deploy_unit ## Deploy infrastructure
