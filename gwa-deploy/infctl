@@ -147,6 +147,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     tests_pass = deployment_smoke_test(ingress_ip)
     k8s_nodes = linodeapi.get_k8s_nodes()
     logging.info(f"Number of lke linodes: {len(k8s_nodes)}")
+    logging.info(f"Querying for cluster ID with tag env_{env} and found: {linodeapi.get_cluster_id(env)}")
     if not keep:
         delete_cluster(cluster_id)  # delete cluster to not incur charges
     else:

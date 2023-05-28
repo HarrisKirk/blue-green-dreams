@@ -2,6 +2,7 @@ import requests
 import os
 import json
 import logging
+import util
 
 token = os.environ.get("LINODE_CLI_TOKEN")
 headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
@@ -25,7 +26,12 @@ def get_cluster_id(env: str):
     url = f"https://api.linode.com/v4/lke/clusters"
     parsed_json = _invoke_rest_call(url)
     data = parsed_json["data"]
-    clusters = [cluster for cluster in data if f"env_{env}" in cluster["tags"]]
+    clusters = []
+    for cluster in data:
+        tag_dict = util.tags_as_dict(cluster["tags"])
+        logging.info(f"The tags associated with {cluster['id']} are: {tag_dict}")
+        if env == util.tags_as_dict(cluster["tags"])["env"]:
+            clusters.append(cluster)  
     if len(clusters) > 1:
         logging.exception(f"List of clusters with tag 'env_{env}' exceeds 1??")
     if clusters == []:

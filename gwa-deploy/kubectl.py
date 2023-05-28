@@ -44,6 +44,7 @@ def apply_service():
     return
 
 
+@retry(tries=5, delay=10)
 def delete_service():
     cmd = ["kubectl", "delete", "svc", "gwa"]
     execute_sh(cmd)
