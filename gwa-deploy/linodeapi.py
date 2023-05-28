@@ -37,7 +37,7 @@ def get_cluster_id(env: str):
     if clusters == []:
         return None
     cluster_id = clusters[0]["id"]
-    return cluster_id
+    return str(cluster_id)
 
 def _invoke_rest_call(url: str):
     logging.debug(f"REST call to {url}")
