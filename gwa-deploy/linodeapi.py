@@ -22,6 +22,16 @@ def get_all_clusters():
     clusters = [{'id': cluster['id'], 'tags': cluster['tags']} for cluster in data ]
     return clusters
 
+def get_nodebalancer_id(ingress_ip):
+    url = f"https://api.linode.com/v4/nodebalancers"
+    parsed_json = _invoke_rest_call(url)
+    logging.debug(parsed_json)
+    data = parsed_json["data"]
+    ids = [{'id': nb['id'], 'ipv4': nb['ipv4']} for nb in data if nb['ipv4'] == ingress_ip]
+    if len(ids) != 1:
+        raise Exception(f"ERROR: ids of nodebalancer list {ids} != 1")
+    return ids[0]['id']
+
 def get_cluster_id(env: str):
     url = f"https://api.linode.com/v4/lke/clusters"
     parsed_json = _invoke_rest_call(url)
