@@ -32,7 +32,9 @@ def get_nodebalancer_id(ingress_ip):
         raise Exception(f"ERROR: ids of nodebalancer list {ids} != 1")
     return str(ids[0]['id'])
 
-def get_cluster_id(env: str):
+
+def get_cluster_id(project: str, env: str):
+    """ Get the cluster ID of the k8s cluster in the project and environment"""
     url = f"https://api.linode.com/v4/lke/clusters"
     parsed_json = _invoke_rest_call(url)
     data = parsed_json["data"]
@@ -40,10 +42,10 @@ def get_cluster_id(env: str):
     for cluster in data:
         tag_dict = util.tags_as_dict(cluster["tags"])
         logging.info(f"The tags associated with {cluster['id']} are: {tag_dict}")
-        if env == util.tags_as_dict(cluster["tags"])["env"]:
+        if env == tag_dict["env"] and project == tag_dict["project"]:
             clusters.append(cluster)  
     if len(clusters) > 1:
-        logging.exception(f"List of clusters with tag 'env_{env}' exceeds 1??")
+        logging.exception(f"List of clusters in project '{project}' and env '{env}' exceeds 1??")
     if clusters == []:
         return None
     cluster_id = clusters[0]["id"]

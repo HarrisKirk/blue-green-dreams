@@ -170,7 +170,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     nodebalancer_id = linodeapi.get_nodebalancer_id(ingress_ip)
     logging.info(f"The nodebalancer id of the service is: {nodebalancer_id}")
     set_nodebalancer_tags(k8s_env, nodebalancer_id)
-    logging.info(f"Querying for cluster ID with tag env_{env} and found: {linodeapi.get_cluster_id(env)}")
+    logging.info(f"Querying for cluster ID with tag env_{env} and found: {linodeapi.get_cluster_id(PROJECT_ACRONYM, env)}")
     if not keep:
         delete_cluster(cluster_id)  # delete cluster to not incur charges
     else:
@@ -183,7 +183,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
 def ls_clusters(
     env: str
 ):
-    cluster_id = linodeapi.get_cluster_id(env)
+    cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, env)
     logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")
 
 if __name__ == "__main__":
