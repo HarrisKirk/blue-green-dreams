@@ -71,6 +71,21 @@ def create_cluster(k8s_env):
     cluster_id = json_object[0]["id"]
     return str(cluster_id)
 
+def set_nodebalancer_tags(k8s_env, nodebalancer_id):
+    """Set tags on the k8s service's nodebalancer"""
+    cmd = [
+        "linode-cli",
+        "nodebalancers",
+        "update",
+        nodebalancer_id,
+        "--tags",
+        f"project_{PROJECT_ACRONYM}", 
+        "--tags",
+        f"env_{k8s_env}",
+        "--json",
+    ]
+    execute_linode_cli(cmd)
+    return
 
 
 def delete_cluster(cluster_id):
@@ -152,8 +167,9 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     tests_pass = deployment_smoke_test(ingress_ip)
     k8s_nodes = linodeapi.get_k8s_nodes()
     logging.info(f"Number of lke linodes: {len(k8s_nodes)}")
-    id = linodeapi.get_nodebalancer_id("45.79.246.135")
-    logging.info(f"The nodebalancer id of the service is: {id}")
+    nodebalancer_id = linodeapi.get_nodebalancer_id(ingress_ip)
+    logging.info(f"The nodebalancer id of the service is: {nodebalancer_id}")
+    set_nodebalancer_tags(k8s_env, nodebalancer_id)
     logging.info(f"Querying for cluster ID with tag env_{env} and found: {linodeapi.get_cluster_id(env)}")
     if not keep:
         delete_cluster(cluster_id)  # delete cluster to not incur charges

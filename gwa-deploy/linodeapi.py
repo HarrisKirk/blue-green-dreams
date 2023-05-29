@@ -30,7 +30,7 @@ def get_nodebalancer_id(ingress_ip):
     ids = [{'id': nb['id'], 'ipv4': nb['ipv4']} for nb in data if nb['ipv4'] == ingress_ip]
     if len(ids) != 1:
         raise Exception(f"ERROR: ids of nodebalancer list {ids} != 1")
-    return ids[0]['id']
+    return str(ids[0]['id'])
 
 def get_cluster_id(env: str):
     url = f"https://api.linode.com/v4/lke/clusters"
