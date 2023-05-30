@@ -22,7 +22,7 @@ def get_all_clusters():
     clusters = [{'id': cluster['id'], 'tags': cluster['tags']} for cluster in data ]
     return clusters
 
-def get_nodebalancer_id(ingress_ip):
+def get_nodebalancer_id_by_ingress(ingress_ip):
     url = f"https://api.linode.com/v4/nodebalancers"
     parsed_json = _invoke_rest_call(url)
     logging.debug(parsed_json)
@@ -31,6 +31,23 @@ def get_nodebalancer_id(ingress_ip):
     if len(ids) != 1:
         raise Exception(f"ERROR: ids of nodebalancer list {ids} != 1")
     return str(ids[0]['id'])
+
+def get_nodebalancer_id(project: str, env: str):
+    url = f"https://api.linode.com/v4/nodebalancers"
+    parsed_json = _invoke_rest_call(url)
+    data = parsed_json["data"]
+    nodebalancers = []
+    for nb in data:
+        tag_dict = util.tags_as_dict(nb["tags"])
+        logging.debug(f"The tags associated with {nb['id']} are: {tag_dict}")
+        if env == tag_dict.get("env") and project == tag_dict.get("project"):
+            nodebalancers.append(nb)  
+    if len(nodebalancers) > 1:
+        logging.exception(f"List of nodebalancers in project '{project}' and env '{env}' exceeds 1??")
+    if nodebalancers == []:
+        return None
+    nodebalancers_id = nodebalancers[0]["id"]
+    return str(nodebalancers_id)
 
 
 def get_cluster_id(project: str, env: str):
@@ -41,8 +58,8 @@ def get_cluster_id(project: str, env: str):
     clusters = []
     for cluster in data:
         tag_dict = util.tags_as_dict(cluster["tags"])
-        logging.info(f"The tags associated with {cluster['id']} are: {tag_dict}")
-        if env == tag_dict["env"] and project == tag_dict["project"]:
+        logging.debug(f"The tags associated with {cluster['id']} are: {tag_dict}")
+        if env == tag_dict.get("env") and project == tag_dict.get("project"):
             clusters.append(cluster)  
     if len(clusters) > 1:
         logging.exception(f"List of clusters in project '{project}' and env '{env}' exceeds 1??")
