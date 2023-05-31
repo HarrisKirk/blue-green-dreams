@@ -2,7 +2,7 @@
 def tags_as_dict(tags: list[str]) -> dict[str, str]:
     tag_dict: dict[str, str] = {}
     for tag in tags:
-        parts = tag.split('_')
+        parts = tag.split("_")
         if len(parts) == 2:  # Ignore any tag not in xxx_yyy format
             key = parts[0]
             value = parts[1]
