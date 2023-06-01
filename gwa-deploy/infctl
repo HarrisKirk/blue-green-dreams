@@ -75,7 +75,7 @@ def delete_nodebalancer(nodebalancer_id):
     """Delete nodebalancer"""
     cmd = [
         "linode-cli",
-        "nodebalancer",
+        "nodebalancers",
         "delete",
         nodebalancer_id,
         "--json",
@@ -101,9 +101,13 @@ def set_nodebalancer_tags(k8s_env, nodebalancer_id):
     execute_linode_cli(cmd)
     return
 
-
 def delete_cluster(cluster_id):
     kubectl.delete_service()  # Must delete the NodeBalancer before and in addition to the cluster
+    delete_cluster_only(cluster_id)
+    return
+
+
+def delete_cluster_only(cluster_id):
     cmd = ["linode-cli", "lke", "cluster-delete", cluster_id]
     json_object = execute_linode_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
@@ -175,7 +179,7 @@ def delete_environment(env: str):
     cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, env)
     logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")    
     if cluster_id:
-        delete_cluster(cluster_id)
+        delete_cluster_only(cluster_id)
     nodebalancer_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, env)
     logging.info(f"nodebalancer ID with tag 'env_{env}': {nodebalancer_id}")    
     if nodebalancer_id:
