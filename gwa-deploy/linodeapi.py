@@ -12,6 +12,7 @@ TOKEN = os.environ.get("LINODE_CLI_TOKEN")
 HEADERS = {"Content-Type": "application/json", "Authorization": f"Bearer {TOKEN}"}
 LINODE_API_ROOT = "https://api.linode.com/v4"
 
+
 def get_k8s_nodes():
     parsed_json = _invoke_rest_call(f"/linode/instances")
     all_linodes = parsed_json["data"]
@@ -74,7 +75,7 @@ def get_cluster_id(project: str, env: str):
 
 def _invoke_rest_call(url: str):
     logging.debug(f"REST call to {url}")
-    response = requests.get(LINODE_API_ROOT + url, headers = HEADERS)
+    response = requests.get(LINODE_API_ROOT + url, headers=HEADERS)
     if response.status_code != 200:
         return f"Error: {response.status_code} - {response.text}"
     parsed_json = json.loads(response.text)
