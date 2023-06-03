@@ -4,6 +4,10 @@ import os
 import logging
 import json
 
+"""
+Issue kubectl commands on the running linode cluster
+"""
+
 WEATHER_API_TOKEN = os.environ.get("WEATHER_API_TOKEN")
 KUBERNETES_NODE_COUNT = "2"
 

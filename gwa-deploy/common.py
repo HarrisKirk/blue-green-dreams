@@ -1,5 +1,5 @@
 """
-Common functions related to running local and remote processes 
+Common shell commands.
 """
 import subprocess
 import json
@@ -7,7 +7,9 @@ import logging
 
 
 def execute_linode_cli(cmd):
-    """Run a command.   Assume the command is a linode-cli command and process error accordingly"""
+    """Run a command.   Assume the command is a linode-cli command and specify --json as return type."""
+    if "--json" not in cmd:
+        cmd.append("--json") 
     logging.debug(" ".join(cmd))
     completed_process = subprocess.run(cmd, cwd=".", check=False, shell=False, capture_output=True)
 

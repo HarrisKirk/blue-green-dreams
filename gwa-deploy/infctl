@@ -33,7 +33,6 @@ KUBERNETES_VERSION = "1.26"
 def get_kubeconfig(cluster_id):
     cmd = [
         "linode-cli",
-        "--json",
         "lke",
         "kubeconfig-view",
         cluster_id,
@@ -65,7 +64,6 @@ def create_cluster(k8s_env):
         KUBERNETES_VERSION,
         "--node_pools.count",
         kubectl.KUBERNETES_NODE_COUNT,
-        "--json",
     ]
     json_object = execute_linode_cli(cmd)
     cluster_id = json_object[0]["id"]
@@ -78,7 +76,6 @@ def delete_nodebalancer(nodebalancer_id):
         "nodebalancers",
         "delete",
         nodebalancer_id,
-        "--json",
     ]
     json_object = execute_linode_cli(cmd)
     logging.debug(f"nodebalancer delete returned {json_object}")
@@ -96,7 +93,6 @@ def set_nodebalancer_tags(k8s_env, nodebalancer_id):
         f"project_{PROJECT_ACRONYM}", 
         "--tags",
         f"env_{k8s_env}",
-        "--json",
     ]
     execute_linode_cli(cmd)
     return

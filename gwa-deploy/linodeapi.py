@@ -4,6 +4,10 @@ import json
 import logging
 import util
 
+"""
+Use the linode REST api to read information about account artifacts
+"""
+
 TOKEN = os.environ.get("LINODE_CLI_TOKEN")
 HEADERS = {"Content-Type": "application/json", "Authorization": f"Bearer {TOKEN}"}
 LINODE_API_ROOT = "https://api.linode.com/v4"
