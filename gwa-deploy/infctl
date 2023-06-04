@@ -172,13 +172,14 @@ def verify_deployment(k8s_env):
     return cluster_id, ingress_ip
 
 def delete_environment(env: str):
+    """Delete Akamai items associated with this env"""
     cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, env)
-    logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")    
     if cluster_id:
+        logging.info(f"Cluster ID in environment {env} found: {cluster_id}")
         delete_cluster_only(cluster_id)
     nodebalancer_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, env)
-    logging.info(f"nodebalancer ID with tag 'env_{env}': {nodebalancer_id}")    
     if nodebalancer_id:
+        logging.info(f"nodebalancer ID in environment {env} found: {nodebalancer_id}") 
         delete_nodebalancer(nodebalancer_id)
 
 
