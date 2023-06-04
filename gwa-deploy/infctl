@@ -44,18 +44,18 @@ def get_kubeconfig(cluster_id):
     return base64.b64decode(base_64_kubeconfig).decode("ascii")
 
 
-def create_cluster(k8s_env):
+def create_cluster(env):
     """Create a K8S cluster"""
     cmd = [
         "linode-cli",
         "lke",
         "cluster-create",
         "--tags",
-        f"env_{k8s_env}",
+        f"env_{env}",
         "--tags",
         f"project_{PROJECT_ACRONYM}", 
         "--label",
-        f"{PROJECT_ACRONYM} cluster for {k8s_env}",
+        f"{PROJECT_ACRONYM} cluster for {env}",
         "--region",
         "us-east",
         "--node_pools.type",
@@ -82,7 +82,7 @@ def delete_nodebalancer(nodebalancer_id):
     logging.info(f"nodebalancer id '{nodebalancer_id}' was deleted")
     return
 
-def set_nodebalancer_tags(k8s_env, nodebalancer_id):
+def set_nodebalancer_tags(env, nodebalancer_id):
     """Set tags on the k8s service's nodebalancer"""
     cmd = [
         "linode-cli",
@@ -92,7 +92,7 @@ def set_nodebalancer_tags(k8s_env, nodebalancer_id):
         "--tags",
         f"project_{PROJECT_ACRONYM}", 
         "--tags",
-        f"env_{k8s_env}",
+        f"env_{env}",
     ]
     execute_linode_cli(cmd)
     return
@@ -150,8 +150,8 @@ def install_argocd():
     return
     
 
-def verify_deployment(k8s_env):
-    cluster_id = create_cluster(k8s_env)
+def verify_deployment(env):
+    cluster_id = create_cluster(env)
     logging.info(f"Cluster id '{cluster_id}' was created")
     logging.info(f"Waiting to receive kubeconfig...")
     try:
@@ -185,15 +185,15 @@ def delete_environment(env: str):
 
 @app.command()
 def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster running after deployment and test")):
-    k8s_env = env
-    logging.info(f"Creating k8s environment '{k8s_env}' with keep={keep}")
-    cluster_id, ingress_ip = verify_deployment(k8s_env)
+    env = env
+    logging.info(f"Creating k8s environment '{env}' with keep={keep}")
+    cluster_id, ingress_ip = verify_deployment(env)
     tests_pass = deployment_smoke_test(ingress_ip)
     k8s_nodes = linodeapi.get_k8s_nodes()
     logging.info(f"Number of lke linodes: {len(k8s_nodes)}")
     nodebalancer_id = linodeapi.get_nodebalancer_id_by_ingress(ingress_ip)
     logging.info(f"The nodebalancer id of the service is: {nodebalancer_id}")
-    set_nodebalancer_tags(k8s_env, nodebalancer_id)
+    set_nodebalancer_tags(env, nodebalancer_id)
     logging.info(f"Querying for cluster ID with tag env_{env} and found: {linodeapi.get_cluster_id(PROJECT_ACRONYM, env)}")
     if not keep:
         delete_cluster(cluster_id)  # delete cluster to not incur charges
