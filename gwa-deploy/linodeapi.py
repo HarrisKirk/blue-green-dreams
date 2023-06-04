@@ -21,13 +21,6 @@ def get_k8s_nodes():
     return k8s_nodes
 
 
-def get_all_clusters():
-    parsed_json = _invoke_rest_call(f"/lke/clusters")
-    data = parsed_json["data"]
-    clusters = [{"id": cluster["id"], "tags": cluster["tags"]} for cluster in data]
-    return clusters
-
-
 def get_nodebalancer_id_by_ingress(ingress_ip):
     parsed_json = _invoke_rest_call(f"/nodebalancers")
     logging.debug(parsed_json)
