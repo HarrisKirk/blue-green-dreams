@@ -3,6 +3,7 @@
 Manage all aspects of the creation of infrastructure and app deployment
 """
 from common import execute_linode_cli, execute_sh
+import switch
 import linodeapi
 import subprocess
 import kubectl
@@ -217,6 +218,27 @@ def rm(
     env: str
 ):
     delete_environment(env)
+
+
+@app.command()
+def switch_create():
+    nb_id = switch.create_controller_switch(PROJECT_ACRONYM)
+    logging.info(f"Created controller switch for project {PROJECT_ACRONYM} with id {nb_id}")
+    switch.add_tags(nb_id, PROJECT_ACRONYM, "common")
+
+@app.command()
+def switch_view():
+    nb_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, "common")  
+    if nb_id:
+        logging.info(f"The id of switch is {nb_id} ")
+
+
+@app.command()
+def switch_delete():
+    nb_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, "common")  
+    if nb_id:
+        logging.debug(f"The id of switch is {nb_id} ")
+        switch.switch_delete(nb_id)
 
 if __name__ == "__main__":
     app()
