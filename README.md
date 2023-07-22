@@ -15,14 +15,17 @@ It completely builds, deploys, tests and destroys a web application running on a
 A make target will perform steps below (without pushing to dockerhub)
 
 # Getting Started
-```$ make alias```
+
+* ```$ make build```
+* ```$ make build_deploy```
+* ```$ make alias```
 * cut-paste the alias command or place into .bashrc
 * Ensure your API key is set: LINODE_CLI_TOKEN=f1bb76c659875deec37108a58xxxxx
 * Try the following commands
   
-* ```bgdctl deploy dev```
-* ```bgdctl switch-create```
-* ```bgdctl switch-delete```
+* ```$ bgdctl deploy dev```
+* ```$ bgdctl switch-create```
+* ```$ bgdctl switch-delete```
 
 
 
