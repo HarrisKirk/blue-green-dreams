@@ -46,5 +46,5 @@ web: build ## Launch a local docker flask site
 	docker container rm -f $(PROJECT_ACRONYM) ;\
 	docker container run -e WEATHER_API_TOKEN --rm -it --name $(PROJECT_ACRONYM) --network host --detach cjtkirk1/gwa:latest ;\
 
-alias: ## Echo an alias to run bgctl from docker
+alias: ## Echo an alias to run bgdctl from docker
 	echo "alias bgdctl='docker container run $(DOCKER_DEPLOY_VOLUMES) $(DOCKER_ENV_STRING) --rm --name $(PROJECT_ACRONYM)_deploy --network host $(DOCKER_DEPLOY_IMAGE_NAME)'"
