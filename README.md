@@ -14,17 +14,14 @@ It completely builds, deploys, tests and destroys a web application running on a
 # Development Environment
 A make target will perform steps below (without pushing to dockerhub)
 
-# CD via GitHub Actions
-The GitHub Actions will do the following
-* build the docker web app image 
-* test it
-* push the image to dockerhub
-* build the docker image containing deployment code
-* run the deployment which performs:
-    * create k8s cluster in linode cloud
-    * creates k8s deployment and service
-    * waits for loadbalancer
-    * tests the web application
-    * destroys the k8s cluster and all associated artifacts
+# Getting Started
+```$ make alias```
+* cut-paste the alias command or place into .bashrc
+* Ensure your API key is set: LINODE_CLI_TOKEN=f1bb76c659875deec37108a58xxxxx
+```bgdctl deploy dev```
+```bgdctl switch-create```
+```bgdctl switch-delete```
+
+
 
 
