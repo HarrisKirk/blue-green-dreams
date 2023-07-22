@@ -18,9 +18,11 @@ A make target will perform steps below (without pushing to dockerhub)
 ```$ make alias```
 * cut-paste the alias command or place into .bashrc
 * Ensure your API key is set: LINODE_CLI_TOKEN=f1bb76c659875deec37108a58xxxxx
-```bgdctl deploy dev```
-```bgdctl switch-create```
-```bgdctl switch-delete```
+* Try the following commands
+  
+* ```bgdctl deploy dev```
+* ```bgdctl switch-create```
+* ```bgdctl switch-delete```
 
 
 
