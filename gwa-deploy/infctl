@@ -219,21 +219,26 @@ def rm(
 ):
     delete_environment(env)
 
-
 @app.command()
+def switch(operation: str):
+    match operation:
+        case "create": switch_create()
+        case "view": switch_view()
+        case "delete": switch_delete()
+        case _:
+            raise Exception("invalid switch command")
+
 def switch_create():
     nb_id = switch.create_controller_switch(PROJECT_ACRONYM)
     logging.info(f"Created controller switch for project {PROJECT_ACRONYM} with id {nb_id}")
     switch.add_tags(nb_id, PROJECT_ACRONYM, "common")
 
-@app.command()
 def switch_view():
     nb_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, "common")  
     if nb_id:
         logging.info(f"The id of switch is {nb_id} ")
 
 
-@app.command()
 def switch_delete():
     nb_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, "common")  
     if nb_id:
