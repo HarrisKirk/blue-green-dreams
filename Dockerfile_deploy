@@ -30,6 +30,7 @@ RUN pip install -r requirements.txt --upgrade
 RUN pip install --upgrade linode-cli
 RUN pip install black
 
+RUN apt update && apt apt install -y jq
 
 COPY gwa-deploy .
 
