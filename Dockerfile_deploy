@@ -34,4 +34,4 @@ RUN apt update && apt install -y jq
 
 COPY gwa-deploy .
 
-ENTRYPOINT ["python", "./infctl"]
+ENTRYPOINT ["python", "./bgdctl"]
