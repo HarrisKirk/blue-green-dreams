@@ -229,21 +229,40 @@ def switch(operation: str):
             raise Exception("invalid switch command")
 
 def switch_create():
-    nb_id = switch_module.create_controller_switch(PROJECT_ACRONYM)
-    logging.info(f"Created controller switch for project {PROJECT_ACRONYM} with id {nb_id}")
-    switch_module.add_tags(nb_id, PROJECT_ACRONYM, "common")
+    cmd = [
+        "bash",
+        "-c",
+        "/gwa_deploy/nginx-lb/setup.sh"
+    ]
+    execute_sh(cmd)
+
+    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
+    switch_view()
+
 
 def switch_view():
-    nb_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, "common")  
-    if nb_id:
-        logging.info(f"The id of switch is {nb_id} ")
+    cmd = [
+        "linode-cli",
+        "linodes",
+        "list",
+        "--label",
+        "linode-blue-green-lb",
+    ]
+    response = execute_sh(cmd)
+
+    logging.info(f"Info about the linode with nginx load balancer: \n{response}")
 
 
 def switch_delete():
-    nb_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, "common")  
-    if nb_id:
-        logging.debug(f"The id of switch is {nb_id} ")
-        switch_module.switch_delete(nb_id)
+    cmd = [
+        "bash",
+        "-c",
+        "/gwa_deploy/nginx-lb/delete.sh"
+    ]
+    execute_sh(cmd)
+
+    switch_view()
+    logging.info("Deleted linode with nginx load balancer")
 
 if __name__ == "__main__":
     app()

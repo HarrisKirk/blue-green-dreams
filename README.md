@@ -16,6 +16,26 @@ A make target will perform steps below (without pushing to dockerhub)
 
 # Getting Started
 
+## Environment variables 
+
+The following environment variables are required:
+
+* LINODE_CLI_TOKEN
+
+* SSH_NGINX_LB_PRIVATE_KEY_B64
+
+  This can be generated with `ssh-keygen -t ed25519 -f blue-green-keys -N ''`. And then base64 encode it with `base64 -w 0 < blue-green-keys` (`base64 -i blue-green-keys | tr -d '\n'` on Mac).
+
+* SSH_NGINX_LB_PUBLIC_KEY
+
+  This will be the contents of the `blue-green-keys.pub` file generated with the earlier `ssh-keygen -t ed25519 -f blue-green-keys -N ''`.
+
+* NGINX_LB_ROOT_PASSWORD
+
+  This will be the root password to the linode VM instance, this is requried to be set when creating an instance.
+
+## Commands example
+
 * ```$ make build```
 * ```$ make build_deploy```
 * ```$ make alias```
@@ -24,8 +44,8 @@ A make target will perform steps below (without pushing to dockerhub)
 * Try the following commands
   
 * ```$ bgdctl deploy dev```
-* ```$ bgdctl switch-create```
-* ```$ bgdctl switch-delete```
+* ```$ bgdctl switch create```
+* ```$ bgdctl switch delete```
 
 
 
