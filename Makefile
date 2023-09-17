@@ -42,7 +42,7 @@ format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa --entrypoint "black" $(DOCKER_IMAGE_NAME) --verbose --line-length=120 /gwa
 	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy --entrypoint "black" $(DOCKER_DEPLOY_IMAGE_NAME) --verbose --line-length=120 /gwa-deploy
 
-web: build ## Launch a local docker flask site
+web: build ## Launch a local docker flask site (locahost:8000 to view web page)
 	docker container rm -f $(PROJECT_ACRONYM) ;\
 	docker container run -e WEATHER_API_TOKEN --rm -it --name $(PROJECT_ACRONYM) --network host --detach cjtkirk1/gwa:latest ;\
 
