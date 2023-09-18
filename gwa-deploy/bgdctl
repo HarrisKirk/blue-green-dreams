@@ -223,52 +223,12 @@ def rm(
 def switch(operation: str):
     match operation:
         case "create": 
-            switch_create()
+            switch_module.switch_create()
 
-        case "view": switch_view()
-        case "delete": switch_delete()
+        case "view": switch_module.switch_view()
+        case "delete": switch_module.switch_delete()
         case _:
             raise Exception("invalid switch command")
-
-def switch_create():
-    cmd = [
-        "bash",
-        "-c",
-        "/gwa_deploy/nginx-lb/setup.sh"
-    ]
-    execute_sh(cmd)
-
-    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
-    return switch_view()
-
-
-def switch_view():
-    cmd = [
-        "linode-cli",
-        "linodes",
-        "list",
-        "--label",
-        "linode-blue-green-lb",
-    ]
-    response = execute_linode_cli(cmd)
-    if response == []:
-        msg = "No switch exists"
-        ip = ''
-    else:
-        ip = response[0]['ipv4'][0]
-        msg = f"IP of switch is: {ip}"
-    logging.info(msg)
-    return ip
-
-
-def switch_delete():
-    cmd = [
-        "bash",
-        "-c",
-        "/gwa_deploy/nginx-lb/delete.sh"
-    ]
-    execute_sh(cmd)
-    logging.info("Deleted linode with nginx load balancer")
 
 if __name__ == "__main__":
     app()

@@ -7,6 +7,8 @@ import json
 Issue linode-cli commands to create the controller switch
 """
 
+PROJECT_ACRONYM = 'bgd'
+
 def create_controller_switch(project):
     """ Create a controller nodebalancer to switch between blue and green envs """
     logging.info(f"here I am creating project_{project}")
@@ -39,12 +41,45 @@ def add_tags(nb_id, PROJECT_ACRONYM, env):
     json_object = execute_linode_cli(cmd)
     return
 
-def switch_delete(nb_id):
+
+def switch_delete():
+    cmd = [
+        "bash",
+        "-c",
+        "/gwa_deploy/nginx-lb/delete.sh"
+    ]
+    execute_sh(cmd)
+    logging.info("Deleted linode with nginx load balancer")
+
+
+def switch_create():
+    cmd = [
+        "bash",
+        "-c",
+        "/gwa_deploy/nginx-lb/setup.sh"
+    ]
+    execute_sh(cmd)
+
+    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
+    return switch_view()
+
+
+def switch_view():
     cmd = [
         "linode-cli",
-        "nodebalancers",
-        "rm",
-        str(nb_id)
+        "linodes",
+        "list",
+        "--label",
+        "linode-blue-green-lb",
     ]
-    json_object = execute_linode_cli(cmd)        
-    return    
+    response = execute_linode_cli(cmd)
+    if response == []:
+        msg = "No switch exists"
+        ip = ''
+    else:
+        ip = response[0]['ipv4'][0]
+        msg = f"IP of switch is: {ip}"
+    logging.info(msg)
+    return ip
+
+
