@@ -5,16 +5,34 @@ import json
 import requests
 
 """
-Issue linode-cli commands to create the controller switch
+Issue linode-cli commands to manage the controller switch
 """
 
 PROJECT_ACRONYM = "bgd"
 
-
 def switch_delete():
-    cmd = ["bash", "-c", "/gwa_deploy/nginx-lb/delete.sh"]
+    cmd = [
+        "linode-cli",
+        "linodes",
+        "list",
+        "--label",
+        "linode-blue-green-lb",
+        "--json"
+    ]
+    json_object = execute_linode_cli(cmd)
+    if json_object == []:
+        logging.warning(f"No switch found")
+        return
+    id = json_object[0]["id"]
+    logging.debug(f"switch id: {id}")
+    cmd = [
+        "linode-cli",
+        "linodes",
+        "delete",
+        f"{id}"
+    ]
     execute_sh(cmd)
-    logging.info("Deleted linode with nginx load balancer")
+    logging.info(f"Deleted linode id {id} with nginx load balancer")
 
 
 def switch_create():
