@@ -3,6 +3,7 @@ from retry import retry
 import logging
 import json
 import requests
+import os
 
 """
 Issue linode-cli commands to manage the controller switch
@@ -36,21 +37,41 @@ def switch_delete():
 
 
 def switch_create():
-    cmd = ["bash", "-c", "/gwa_deploy/nginx-lb/setup.sh"]
-    execute_sh(cmd)
+    cmd = [
+        "linode-cli",
+        "linodes",
+        "create",
+        "--region",
+        "us-east",
+        "--image",
+        "linode/debian11",
+        "--label",
+        "linode-blue-green-lb",
+        "--type",
+        "g6-standard-1",
+        "--authorized_keys",
+        os.environ.get("SSH_NGINX_LB_PUBLIC_KEY"),
+        "--root_pass",
+        os.environ.get("NGINX_LB_ROOT_PASSWORD"),
+    ]
+    json_object = execute_linode_cli(cmd)
+    id = json_object[0]['id']
+    ip = json_object[0]['ipv4'][0]
+    logging.debug(f"Nginx switch create with id: {id} and IP: {ip}")
 
-    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
-
-    switch_resource = switch_get()
-    if switch_resource != []:
-        if switch_smoke_test(switch_resource[0]["ipv4"][0]):
-            logging.info("[OK] Nginx switch smoke test passes")
-            return switch_view()
-        else:
-            raise Exception(f"Smoke test failed {PROJECT_ACRONYM}")
-    else:
-        logging.info("No switch exists")
-
+#
+#    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
+#
+#    switch_resource = switch_get()
+#    if switch_resource != []:
+#        if switch_smoke_test(switch_resource[0]["ipv4"][0]):
+#            logging.info("[OK] Nginx switch smoke test passes")
+#            return switch_view()
+#        else:
+#            raise Exception(f"Smoke test failed {PROJECT_ACRONYM}")
+#    else:
+#        logging.info("No switch exists")
+#
 
 @retry(tries=20, delay=10)
 def wait_for_http_get(ip):
