@@ -82,7 +82,17 @@ def switch_create():
     ]
     logging.info(str(cmd))
     wait_for_cmd(cmd)
-    logging.info("Nginx switch has been installed")
+    logging.info("Nginx switch is in the Running state")
+    cmd = [
+        "ssh",
+        "-i",
+        private_key_file, 
+        f"root@{ip}",
+        "apt update && apt install -y nginx"
+    ]
+    wait_for_cmd(cmd)
+    os.remove(private_key_file)
+    logging.info("nginx was installed with 'apt update'")
 
 @retry(tries=30, delay=10, logger=logging.getLogger())
 def wait_for_cmd(cmd):
