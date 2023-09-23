@@ -12,27 +12,16 @@ Issue linode-cli commands to manage the controller switch
 
 PROJECT_ACRONYM = "bgd"
 
+
 def switch_delete():
-    cmd = [
-        "linode-cli",
-        "linodes",
-        "list",
-        "--label",
-        "linode-blue-green-lb",
-        "--json"
-    ]
+    cmd = ["linode-cli", "linodes", "list", "--label", "linode-blue-green-lb", "--json"]
     json_object = execute_linode_cli(cmd)
     if json_object == []:
         logging.warning(f"No switch found")
         return
     id = json_object[0]["id"]
     logging.debug(f"switch id: {id}")
-    cmd = [
-        "linode-cli",
-        "linodes",
-        "delete",
-        f"{id}"
-    ]
+    cmd = ["linode-cli", "linodes", "delete", f"{id}"]
     execute_sh(cmd)
     logging.info(f"Deleted linode id {id} with nginx load balancer")
 
@@ -56,8 +45,8 @@ def switch_create():
         os.environ.get("NGINX_LB_ROOT_PASSWORD"),
     ]
     json_object = execute_linode_cli(cmd)
-    id = json_object[0]['id']
-    ip = json_object[0]['ipv4'][0]
+    id = json_object[0]["id"]
+    ip = json_object[0]["ipv4"][0]
     logging.debug(f"Linode instance created with id: {id} and IP: {ip}")
 
     private_key = os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64")
@@ -66,9 +55,9 @@ def switch_create():
     private_key_file = "/tmp/bgd_decoded.txt"
     with open(private_key_file, mode="w") as file:
         file.write(decoded_private_key.decode())
-    cmd = ['chmod', '600', private_key_file]
+    cmd = ["chmod", "600", private_key_file]
     execute_sh(cmd)
-    execute_sh(['cat', private_key_file])
+    execute_sh(["cat", private_key_file])
     cmd = [
         "ssh",
         "-o",
@@ -76,27 +65,23 @@ def switch_create():
         "-o",
         "BatchMode=yes",
         "-i",
-        private_key_file, 
+        private_key_file,
         f"root@{ip}",
-        "hostname"
+        "hostname",
     ]
     logging.info(str(cmd))
     wait_for_cmd(cmd)
     logging.info("Nginx switch is in the Running state")
-    cmd = [
-        "ssh",
-        "-i",
-        private_key_file, 
-        f"root@{ip}",
-        "apt update && apt install -y nginx"
-    ]
+    cmd = ["ssh", "-i", private_key_file, f"root@{ip}", "apt update && apt install -y nginx"]
     wait_for_cmd(cmd)
     os.remove(private_key_file)
     logging.info("nginx was installed with 'apt update'")
 
+
 @retry(tries=30, delay=10, logger=logging.getLogger())
 def wait_for_cmd(cmd):
     execute_sh(cmd)
+
 
 #
 #    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
@@ -111,6 +96,7 @@ def wait_for_cmd(cmd):
 #    else:
 #        logging.info("No switch exists")
 #
+
 
 @retry(tries=20, delay=10)
 def wait_for_http_get(ip):
