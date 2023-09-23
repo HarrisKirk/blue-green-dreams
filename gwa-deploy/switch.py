@@ -77,25 +77,22 @@ def switch_create():
     os.remove(private_key_file)
     logging.info("nginx was installed with 'apt update'")
 
+    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
+
+    switch_resource = switch_get()
+    if switch_resource != []:
+        if switch_smoke_test(switch_resource[0]["ipv4"][0]):
+            logging.info("[OK] Nginx switch smoke test passes")
+            return switch_view()
+        else:
+            raise Exception(f"Smoke test failed {PROJECT_ACRONYM}")
+    else:
+        logging.info("No switch exists")
+
 
 @retry(tries=30, delay=10, logger=logging.getLogger())
 def wait_for_cmd(cmd):
     execute_sh(cmd)
-
-
-#
-#    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
-#
-#    switch_resource = switch_get()
-#    if switch_resource != []:
-#        if switch_smoke_test(switch_resource[0]["ipv4"][0]):
-#            logging.info("[OK] Nginx switch smoke test passes")
-#            return switch_view()
-#        else:
-#            raise Exception(f"Smoke test failed {PROJECT_ACRONYM}")
-#    else:
-#        logging.info("No switch exists")
-#
 
 
 @retry(tries=20, delay=10)
