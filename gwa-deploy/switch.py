@@ -4,6 +4,7 @@ import logging
 import json
 import requests
 import os
+import base64
 
 """
 Issue linode-cli commands to manage the controller switch
@@ -57,7 +58,35 @@ def switch_create():
     json_object = execute_linode_cli(cmd)
     id = json_object[0]['id']
     ip = json_object[0]['ipv4'][0]
-    logging.debug(f"Nginx switch create with id: {id} and IP: {ip}")
+    logging.debug(f"Linode instance created with id: {id} and IP: {ip}")
+
+    private_key = os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64")
+    decoded_private_key = base64.b64decode(private_key)
+    logging.debug(decoded_private_key.decode())
+    private_key_file = "/tmp/bgd_decoded.txt"
+    with open(private_key_file, mode="w") as file:
+        file.write(decoded_private_key.decode())
+    cmd = ['chmod', '600', private_key_file]
+    execute_sh(cmd)
+    execute_sh(['cat', private_key_file])
+    cmd = [
+        "ssh",
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "BatchMode=yes",
+        "-i",
+        private_key_file, 
+        f"root@{ip}",
+        "hostname"
+    ]
+    logging.info(str(cmd))
+    wait_for_cmd(cmd)
+    logging.info("Nginx switch has been installed")
+
+@retry(tries=30, delay=10, logger=logging.getLogger())
+def wait_for_cmd(cmd):
+    execute_sh(cmd)
 
 #
 #    logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
