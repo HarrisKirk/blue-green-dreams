@@ -13,7 +13,7 @@ Issue linode-cli commands to manage the controller switch
 PROJECT_ACRONYM = "bgd"
 
 
-def switch_delete():
+def switch_delete(env):
     cmd = ["linode-cli", "linodes", "list", "--label", "linode-blue-green-lb", "--json"]
     json_object = execute_linode_cli(cmd)
     if json_object == []:
@@ -26,7 +26,7 @@ def switch_delete():
     logging.info(f"Deleted linode id {id} with nginx load balancer")
 
 
-def switch_create():
+def switch_create(env):
     """
     Create a linode instance with nginx as a switch to route traffic to k8s cluster
     """
@@ -46,6 +46,10 @@ def switch_create():
         os.environ.get("SSH_NGINX_LB_PUBLIC_KEY"),
         "--root_pass",
         os.environ.get("NGINX_LB_ROOT_PASSWORD"),
+        "--tags",
+        f"project_{PROJECT_ACRONYM}", 
+        "--tags",
+        f"env_{env}",
     ]
     json_object = execute_linode_cli(cmd)
     id = json_object[0]["id"]
@@ -92,7 +96,7 @@ def wait_for_http_get(ip):
     return requests.get(smoke_test_url)
 
 
-def switch_view():
+def switch_view(env):
     response = switch_get()
     if response == []:
         msg = "No switch exists"

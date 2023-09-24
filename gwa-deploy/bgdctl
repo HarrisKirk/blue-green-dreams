@@ -220,13 +220,13 @@ def rm(
     delete_environment(env)
 
 @app.command()
-def switch(operation: str):
+def switch(operation: str, env: str):
     match operation:
         case "create": 
-            switch_module.switch_create()
+            switch_module.switch_create(env)
 
-        case "view": switch_module.switch_view()
-        case "delete": switch_module.switch_delete()
+        case "view": switch_module.switch_view(env)
+        case "delete": switch_module.switch_delete(env)
         case _:
             raise Exception("invalid switch command")
 
