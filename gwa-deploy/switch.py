@@ -14,10 +14,9 @@ PROJECT_ACRONYM = "bgd"
 
 
 def switch_delete(env):
-    cmd = ["linode-cli", "linodes", "list", "--label", "linode-blue-green-lb", "--json"]
-    json_object = execute_linode_cli(cmd)
+    json_object = switch_get(env)
     if json_object == []:
-        logging.warning(f"No switch found")
+        logging.warning(f"No switch found in environment '{env}'")
         return
     id = json_object[0]["id"]
     logging.debug(f"switch id: {id}")
@@ -39,7 +38,7 @@ def switch_create(env):
         "--image",
         "linode/debian11",
         "--label",
-        "linode-blue-green-lb",
+        f"{PROJECT_ACRONYM}-{env}-switch",
         "--type",
         "g6-standard-1",
         "--authorized_keys",
@@ -97,9 +96,9 @@ def wait_for_http_get(ip):
 
 
 def switch_view(env):
-    response = switch_get()
+    response = switch_get(env)
     if response == []:
-        msg = "No switch exists"
+        msg = f"No switch exists in environment '{env}'"
         ip = ""
     else:
         ip = response[0]["ipv4"][0]
@@ -108,13 +107,15 @@ def switch_view(env):
     return ip
 
 
-def switch_get():
+def switch_get(env):
     cmd = [
         "linode-cli",
         "linodes",
         "list",
-        "--label",
-        "linode-blue-green-lb",
+        "--tags",
+        f"project_{PROJECT_ACRONYM}",
+        "--tags",
+        f"env_{env}",
     ]
     return execute_linode_cli(cmd)
 
