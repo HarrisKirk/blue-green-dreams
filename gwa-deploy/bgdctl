@@ -126,9 +126,9 @@ def write_kubeconfig(kubeconfig):
 
 
 def deployment_smoke_test(ingress_ip):
-    response = wait_for_http_get(ingress_ip)
-    logging.debug(f"Response: {response.text}")
-    if "Richmond" not in response.text:
+    response_text = wait_for_http_get(ingress_ip)
+    logging.debug(f"Response: {response_text}")
+    if "Richmond" not in response_text:
         return False
     logging.info("[OK] Site smoke test passes")
     return True
@@ -137,8 +137,13 @@ def deployment_smoke_test(ingress_ip):
 @retry(tries=20, delay=10)
 def wait_for_http_get(ingress_ip):
     smoke_test_url = f"http://{ingress_ip}:8000"
-    logging.debug(f"Get of {smoke_test_url}")
-    return requests.get(smoke_test_url)
+    logging.debug(f"Invoking {smoke_test_url} ...")
+    response = requests.get(smoke_test_url)
+    logging.debug(f"response_code was: {response.status_code}")
+    if response.status_code == 200:
+        return response.text
+    else:
+        raise Exception(f"ERROR: smoke test status code non-200")
 
 def install_argocd():
     cmd = ["helm", "template"]
