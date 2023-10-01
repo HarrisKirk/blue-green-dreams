@@ -47,7 +47,7 @@ def switch_create(env):
         "--root_pass",
         os.environ.get("NGINX_LB_ROOT_PASSWORD"),
         "--tags",
-        f"project_{PROJECT_ACRONYM}", 
+        f"project_{PROJECT_ACRONYM}",
         "--tags",
         f"env_{env}",
     ]

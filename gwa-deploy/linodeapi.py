@@ -6,6 +6,7 @@ import util
 
 """
 Use the linode REST api to read information about account artifacts
+All queries assume that items are tagged with project and env
 """
 
 TOKEN = os.environ.get("LINODE_CLI_TOKEN")
@@ -22,6 +23,10 @@ def get_k8s_nodes():
 
 
 def get_nodebalancer_id_by_ingress(ingress_ip):
+    """
+    Get the id of the nodebalancer created by kubernetes.
+    The nodebalancer is an Akamai artifact that the kubernetes service depends on
+    """
     parsed_json = _invoke_rest_call(f"/nodebalancers")
     logging.debug(parsed_json)
     data = parsed_json["data"]
