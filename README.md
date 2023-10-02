@@ -44,8 +44,8 @@ The following environment variables are required:
 * Try the following commands
   
 * ```$ bgdctl deploy dev```
-* ```$ bgdctl switch create```
-* ```$ bgdctl switch delete```
+* ```$ bgdctl switch create dev```
+* ```$ bgdctl switch delete dev```
 
 
 
