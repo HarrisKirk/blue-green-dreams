@@ -23,14 +23,14 @@ app = typer.Typer()
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-    level=logging.INFO,
+    level=logging.DEBUG,
     datefmt="%Y-%m-%d at %H:%M:%S",
 )
 
 KUBERNETES_VERSION = "1.26"
 
 
-@retry(tries=50, delay=30)
+@retry(tries=60, delay=60)
 def get_kubeconfig(cluster_id):
     cmd = [
         "linode-cli",
@@ -134,7 +134,7 @@ def deployment_smoke_test(ingress_ip):
     return True
 
 
-@retry(tries=20, delay=10)
+@retry(tries=120, delay=30)
 def wait_for_http_get(ingress_ip):
     smoke_test_url = f"http://{ingress_ip}:8000"
     logging.debug(f"Invoking {smoke_test_url} ...")
@@ -143,7 +143,7 @@ def wait_for_http_get(ingress_ip):
     if response.status_code == 200:
         return response.text
     else:
-        raise Exception(f"ERROR: smoke test status code non-200")
+        raise Exception(f"ERROR: smoke test status code was {response.status_code}.")
 
 def install_argocd():
     cmd = ["helm", "template"]
