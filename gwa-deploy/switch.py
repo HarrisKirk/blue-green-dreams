@@ -111,6 +111,52 @@ def switch_view(env):
     logging.info(msg)
     return ip
 
+def switch_ip_set(env, ip):
+    switch = switch_get(env)
+    switch_ip = switch[0]["ipv4"][0]
+
+    writeSshPrivateKeyToTmp()
+    private_key_file = "/tmp/bgd_decoded.txt"
+
+    # Prepare nginx config
+    with open('nginx-lb/nginx.conf', 'r') as infile:
+        content = infile.read()
+        content = content.replace('127.0.0.1', ip)
+
+        with open('nginx-lb/nginx.conf.replaced', 'w') as outfile:
+            outfile.write(content)
+
+    # Transfer prepared nginx config file over
+    cmd = [
+        "scp",
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "BatchMode=yes",
+        "-i",
+        private_key_file,
+        "nginx-lb/nginx.conf.replaced",
+        f"root@{switch_ip}:/etc/nginx/sites-available/default",
+    ]
+    wait_for_cmd(cmd)
+
+
+    # Test valid nginx config. Reload nginx gracefully
+    cmd = [
+        "ssh",
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "BatchMode=yes",
+        "-i",
+        private_key_file,
+        f"root@{switch_ip}",
+        "nginx -t && service nginx reload",
+    ]
+    wait_for_cmd(cmd)
+
+    os.remove(private_key_file)
+
 
 def switch_get(env):
     cmd = [
