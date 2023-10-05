@@ -24,6 +24,13 @@ def switch_delete(env):
     execute_sh(cmd)
     logging.info(f"Deleted linode id {id} with nginx load balancer")
 
+def writeSshPrivateKeyToTmp():
+    decoded_private_key = base64.b64decode(os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64"))
+    private_key_file = "/tmp/bgd_decoded.txt"
+    with open(private_key_file, mode="w") as file:
+        file.write(decoded_private_key.decode())
+    execute_sh(["chmod", "600", private_key_file])
+
 
 def switch_create(env):
     """
@@ -54,11 +61,9 @@ def switch_create(env):
     id = json_object[0]["id"]
     ip = json_object[0]["ipv4"][0]
     logging.info(f"Linode instance with id: {id} and IP: {ip} is provisioning")
-    decoded_private_key = base64.b64decode(os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64"))
+
+    writeSshPrivateKeyToTmp()
     private_key_file = "/tmp/bgd_decoded.txt"
-    with open(private_key_file, mode="w") as file:
-        file.write(decoded_private_key.decode())
-    execute_sh(["chmod", "600", private_key_file])
     cmd = [
         "ssh",
         "-o",
