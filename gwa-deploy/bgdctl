@@ -240,11 +240,5 @@ def switch(operation: str, env: str):
         case _:
             raise Exception("invalid switch command")
 
-@app.command()
-def switch_set_ip(env: str, ip : str):
-    switch_module.switch_ip_set(env, ip)
-
-    logging.info(f"Succesfully set target IP to {ip} on nginx switch for project {PROJECT_ACRONYM}")
-
 if __name__ == "__main__":
     app()
