@@ -5,6 +5,9 @@ import json
 import requests
 import os
 import base64
+import kubectl
+import linodeapi
+import sys
 
 """
 Issue linode-cli commands to manage the controller switch
@@ -156,6 +159,26 @@ def switch_ip_set(env, ip):
     wait_for_cmd(cmd)
 
     os.remove(private_key_file)
+
+def switch_set_ip_target_to_cluster(env, target_env):
+
+    cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, target_env)
+
+    try:
+        kubeconfig = kubectl.get_kubeconfig(cluster_id)
+    except Exception as e:
+        logging.exception("An exception occurred: %s", str(e))
+        sys.exit(2) # 2 is linode timeout
+
+    logging.debug(f"kubeconfig as yaml: {kubeconfig}")
+    kubectl.write_kubeconfig(kubeconfig)
+
+    ingress_ip = kubectl.get_ingress_ip()
+
+    switch_temp_hardcoded_env='bgd-temp-switch-env'
+
+    logging.debug(f"Attempt to set switch target IP to cluster's ingress IP ({ingress_ip})")
+    switch_ip_set(switch_temp_hardcoded_env, ingress_ip)
 
 
 def switch_get(env):

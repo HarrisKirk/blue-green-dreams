@@ -238,5 +238,12 @@ def switch(operation: str, env: str):
         case _:
             raise Exception("invalid switch command")
 
+@app.command()
+def switch_set_ip_target_to_cluster(env: str, target_env: str):
+    switch_temp_hardcoded_env='bgd-temp-switch-env'
+    switch_module.switch_set_ip_target_to_cluster(switch_temp_hardcoded_env, target_env)
+
+    # logging.info(f"TODO ?")
+
 if __name__ == "__main__":
     app()
