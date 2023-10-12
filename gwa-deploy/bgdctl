@@ -171,19 +171,17 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     cluster_id, ingress_ip = deploy_kubernetes_artifacts(env)
     tests_pass = deployment_smoke_test(ingress_ip)
 
-    switch_temp_hardcoded_env='bgd-temp-switch-env'
+    switch_module.switch_delete(env)
+    switch_module.switch_create(env)
 
-    switch_module.switch_delete(switch_temp_hardcoded_env)
-    switch_module.switch_create(switch_temp_hardcoded_env)
-
-    switch_ip = switch_module.switch_view(switch_temp_hardcoded_env)
+    switch_ip = switch_module.switch_view(env)
     if not switch_ip == '':
         switch_module.switch_smoke_test(switch_ip)
     else:
         raise Exception("ERROR: failed to retrieve switch IP")
 
     logging.debug(f"Attempt to set switch target IP to cluster's ingress IP ({ingress_ip})")
-    switch_module.switch_ip_set(switch_temp_hardcoded_env, ingress_ip)
+    switch_module.switch_ip_set(env, ingress_ip)
     switch_proxy_tests_pass = deployment_smoke_test(switch_ip)
 
     k8s_nodes = linodeapi.get_k8s_nodes()
@@ -198,7 +196,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
         logging.info(f"Cluster ID {cluster_id} is running and incurring charges!")
 
     if not keep_switch:
-        switch_module.switch_delete(switch_temp_hardcoded_env)
+        switch_module.switch_delete(env)
     else:
         logging.info(f"Switch is running and incurring charges!")
 
