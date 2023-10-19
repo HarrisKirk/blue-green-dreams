@@ -164,6 +164,9 @@ def switch_set_ip_target_to_cluster(env, target_env):
 
     cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, target_env)
 
+    if cluster_id is None:
+        raise Exception(f"cluster_id not found for env of: {target_env}")
+
     try:
         kubeconfig = kubectl.get_kubeconfig(cluster_id)
     except Exception as e:
@@ -191,7 +194,12 @@ def switch_get(env):
         "--tags",
         f"env_{env}",
     ]
-    return execute_linode_cli(cmd)
+    v = execute_linode_cli(cmd)
+
+    if v == []:
+        raise Exception("switch_get: linode-cli linodes list empty response")
+
+    return v
 
 
 def switch_smoke_test(switch_ip):
