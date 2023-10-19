@@ -178,10 +178,8 @@ def switch_set_ip_target_to_cluster(env, target_env):
 
     ingress_ip = kubectl.get_ingress_ip()
 
-    switch_temp_hardcoded_env='bgd-temp-switch-env'
-
     logging.debug(f"Attempt to set switch target IP to cluster's ingress IP ({ingress_ip})")
-    switch_ip_set(switch_temp_hardcoded_env, ingress_ip)
+    switch_ip_set(env, ingress_ip)
 
 
 def switch_get(env):

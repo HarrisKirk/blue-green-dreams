@@ -238,10 +238,9 @@ def switch(operation: str, env: str):
 
 @app.command()
 def switch_set_ip_target_to_cluster(env: str, target_env: str):
-    switch_temp_hardcoded_env='bgd-temp-switch-env'
-    switch_module.switch_set_ip_target_to_cluster(switch_temp_hardcoded_env, target_env)
+    switch_module.switch_set_ip_target_to_cluster(env, target_env)
 
-    # logging.info(f"TODO ?")
+    logging.info(f"nginx switch (env: {env}) succesfully set to target ({target_env})")
 
 if __name__ == "__main__":
     app()
