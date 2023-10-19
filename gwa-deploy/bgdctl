@@ -133,14 +133,14 @@ def deploy_kubernetes_artifacts(env):
     logging.info(f"Cluster id '{cluster_id}' was created")
     logging.info(f"Waiting to receive kubeconfig...")
     try:
-        kubeconfig = get_kubeconfig(cluster_id)
+        kubeconfig = kubectl.get_kubeconfig(cluster_id)
     except Exception as e:
         logging.error(f"Waiting period for linode to provide the kubeconfig has expired.  Deleting cluster '{cluster_id}' and aborting.")
         logging.exception("An exception occurred: %s", str(e))
         delete_cluster(cluster_id)  # delete cluster to not incur charges
         sys.exit(2) # 2 is linode timeout
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
-    write_kubeconfig(kubeconfig)
+    kubectl.write_kubeconfig(kubeconfig)
     kubectl.get_nodes()
     install_argocd()
     kubectl.create_secrets()
