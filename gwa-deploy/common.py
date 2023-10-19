@@ -7,6 +7,12 @@ import logging
 
 
 def execute_linode_cli(cmd):
+
+    # Check if all elements in cmd are strings
+    if not all(isinstance(item, str) for item in cmd):
+        logging.warning(f"execute_linode_cli: cmd contains a non-string element: {cmd}")
+
+
     """Run a command.   Assume the command is a linode-cli command and specify --json as return type."""
     if "--json" not in cmd:
         cmd.append("--json")
