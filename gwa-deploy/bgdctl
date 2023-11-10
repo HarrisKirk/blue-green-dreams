@@ -21,14 +21,33 @@ PROJECT_ACRONYM = 'bgd'
 
 app = typer.Typer()
 
-logging.basicConfig(
-    format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-    level=logging.DEBUG,
-    datefmt="%Y-%m-%d at %H:%M:%S",
-)
 
 KUBERNETES_VERSION = "1.26"
 
+def set_logging_level(level_param : str):
+    level_param = level_param.lower()  # Convert to lowercase for case-insensitivity
+
+    match level_param:
+        case "debug":
+            logging_level = logging.DEBUG
+        case "info":
+            logging_level = logging.INFO
+        case "warning":
+            logging_level = logging.WARNING
+        case "error":
+            logging_level = logging.ERROR
+        case "critical":
+            logging_level = logging.CRITICAL
+        case _:
+            raise ValueError(f"Invalid log level: {level_param}")
+
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
+        level=logging_level,
+        datefmt="%Y-%m-%d at %H:%M:%S",
+    )
+
+set_logging_level("debug")
 
 @retry(tries=60, delay=60)
 def get_kubeconfig(cluster_id):
@@ -192,7 +211,10 @@ def delete_environment(env: str):
 # All cli commands follow:
 #/
 @app.command()
-def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster running after deployment and test"), keep_switch: bool = typer.Option(False, help="Keep the switch running after deployment and test")):
+def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster running after deployment and test"), keep_switch: bool = typer.Option(False, help="Keep the switch running after deployment and test"), log_level = "debug"
+):
+    set_logging_level(log_level)
+
     """Deploy a kubernetes cluster in the requested environment"""
     delete_environment(env) # Ensure there is no existing environment
     logging.info(f"Creating k8s environment '{env}' with keep={keep}")
@@ -238,8 +260,10 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
 
 @app.command()
 def ls(
-    env: str
+    env: str , log_level = "debug"
 ):
+    set_logging_level(log_level)
+
     """List Akamai items associated with this project and env"""
     cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, env)
     logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")  
@@ -248,13 +272,17 @@ def ls(
 
 @app.command()
 def rm(
-    env: str
+    env: str , log_level = "debug"
 ):
+    set_logging_level(log_level)
+
     """Remove all artifacts in the env"""
     delete_environment(env)
 
 @app.command()
-def switch(operation: str, env: str):
+def switch(operation: str, env: str, log_level = "debug"):
+    set_logging_level(log_level)
+
     """Perform all operations related to the front-end nginx switch"""
     match operation:
         case "create": 
