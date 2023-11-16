@@ -14,10 +14,22 @@ PROJECT_ACRONYM = "bgd"
 
 
 def switch_delete(env):
-    json_object = switch_get(env)
+    cmd = [
+        "linode-cli",
+        "linodes",
+        "list",
+        "--tags",
+        f"project_{PROJECT_ACRONYM}",
+        "--tags",
+        f"env_{env}",
+    ]
+
+    json_object = execute_linode_cli(cmd)
+
     if json_object == []:
         logging.warning(f"No switch found in environment '{env}'")
         return
+
     id = json_object[0]["id"]
     logging.debug(f"switch id: {id}")
     cmd = ["linode-cli", "linodes", "delete", f"{id}"]
