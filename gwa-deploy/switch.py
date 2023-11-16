@@ -45,6 +45,16 @@ def writeSshPrivateKeyToTmp():
 
 
 def switch_create(env):
+
+    # Retrieve environment variables and handle cases where they are not set
+    ssh_nginx_lb_public_key = os.environ.get("SSH_NGINX_LB_PUBLIC_KEY")
+    if ssh_nginx_lb_public_key is None:
+        raise Exception("Error: SSH_NGINX_LB_PUBLIC_KEY is not set.")
+
+    nginx_lb_root_password = os.environ.get("NGINX_LB_ROOT_PASSWORD")
+    if nginx_lb_root_password is None:
+        raise Exception("Error: NGINX_LB_ROOT_PASSWORD is not set.")
+
     """
     Create a linode instance with nginx as a switch to route traffic to k8s cluster
     """
@@ -61,9 +71,9 @@ def switch_create(env):
         "--type",
         "g6-standard-1",
         "--authorized_keys",
-        os.environ.get("SSH_NGINX_LB_PUBLIC_KEY"),
+        ssh_nginx_lb_public_key,
         "--root_pass",
-        os.environ.get("NGINX_LB_ROOT_PASSWORD"),
+        nginx_lb_root_password,
         "--tags",
         f"project_{PROJECT_ACRONYM}",
         "--tags",
