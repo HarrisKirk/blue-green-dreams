@@ -11,6 +11,9 @@ env:
   REPO_NAME: ${{secrets.REPO_NAME}}  
   DOCKER_IMAGE_NAME: cjtkirk1/gwa
   WEATHER_API_TOKEN: ${{secrets.WEATHER_API_TOKEN}}  
+  SSH_NGINX_LB_PUBLIC_KEY: ${{secrets.SSH_NGINX_LB_PUBLIC_KEY}}
+  NGINX_LB_ROOT_PASSWORD: ${{secrets.NGINX_LB_ROOT_PASSWORD}}
+
 
 jobs:
   build-app:
