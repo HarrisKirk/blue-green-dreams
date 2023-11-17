@@ -37,7 +37,12 @@ def switch_delete(env):
     logging.info(f"Deleted linode id {id} with nginx load balancer")
 
 def writeSshPrivateKeyToTmp():
-    decoded_private_key = base64.b64decode(os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64"))
+
+    private_key_b64 = os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64")
+    if private_key_b64 is None:
+        raise Exception("Error: SSH_NGINX_LB_PRIVATE_KEY_B64 is not set.")
+
+    decoded_private_key = base64.b64decode(os.environ.get(private_key_b64))
     private_key_file = "/tmp/bgd_decoded.txt"
     with open(private_key_file, mode="w") as file:
         file.write(decoded_private_key.decode())
@@ -46,7 +51,6 @@ def writeSshPrivateKeyToTmp():
 
 def switch_create(env):
 
-    # Retrieve environment variables and handle cases where they are not set
     ssh_nginx_lb_public_key = os.environ.get("SSH_NGINX_LB_PUBLIC_KEY")
     if ssh_nginx_lb_public_key is None:
         raise Exception("Error: SSH_NGINX_LB_PUBLIC_KEY is not set.")
