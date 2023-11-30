@@ -25,6 +25,11 @@ app = typer.Typer()
 KUBERNETES_VERSION = "1.26"
 
 def set_logging_level(level_param : str):
+
+    # Remove any existing handlers
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
     level_param = level_param.lower()  # Convert to lowercase for case-insensitivity
 
     match level_param:
