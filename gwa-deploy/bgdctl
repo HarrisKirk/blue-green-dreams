@@ -183,10 +183,17 @@ def delete_environment(env: str):
     if cluster_id:
         logging.info(f"Cluster ID in environment {env} found: {cluster_id}")
         delete_cluster_only(cluster_id)
+
     nodebalancer_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, env)
     if nodebalancer_id:
         logging.info(f"nodebalancer ID in environment {env} found: {nodebalancer_id}") 
         delete_nodebalancer(nodebalancer_id)
+
+    switch_resp = switch_module.switch_get(env)
+    if switch_resp != []:
+        switch_id = switch_resp[0]["id"]
+        logging.info(f"switch ID in environment {env} found: {switch_id}") 
+        switch_module.switch_delete(env)
 
 #\
 # All cli commands follow:
