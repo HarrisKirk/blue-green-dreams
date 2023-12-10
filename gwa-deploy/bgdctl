@@ -280,7 +280,9 @@ def ls(
     cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, env)
     logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")  
     nodebalancer_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, env)
-    logging.info(f"nodebalancer ID with tag 'env_{env}': {nodebalancer_id}")      
+    logging.info(f"nodebalancer ID with tag 'env_{env}': {nodebalancer_id}")
+    switch_id = switch_module.switch_view(env)
+    logging.info(f"switch id with tag 'env_{env}: {switch_id}")
 
 @app.command()
 def rm(
