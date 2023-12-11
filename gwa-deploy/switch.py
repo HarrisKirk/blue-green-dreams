@@ -194,13 +194,7 @@ def switch_get(env):
         "--tags",
         f"env_{env}",
     ]
-
-    v = execute_linode_cli(cmd)
-
-    if v == []:
-        raise Exception("switch_get: linode-cli linodes list empty response")
-
-    return v
+    return execute_linode_cli(cmd)
 
 
 def switch_smoke_test(switch_ip):
