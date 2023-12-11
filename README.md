@@ -46,8 +46,7 @@ The following environment variables are required:
 * ```$ bgdctl deploy dev```
 * ```$ bgdctl switch create dev```
 * ```$ bgdctl switch delete dev```
-* ```$ bgdctl switch-set-ip-target-to-cluster green blue```
-
-
-
-
+* ```$ bgdctl switch-set-ip-target-to-cluster dev blue```
+* ```$ bgdctl switch-set-ip-target-to-cluster dev green```
+* ```$ bgdctl switch-set-ip-target-to-cluster prod blue```
+* ```$ bgdctl switch-set-ip-target-to-cluster prod green```
