@@ -14,10 +14,22 @@ PROJECT_ACRONYM = "bgd"
 
 
 def switch_delete(env):
-    json_object = switch_get(env)
+    cmd = [
+        "linode-cli",
+        "linodes",
+        "list",
+        "--tags",
+        f"project_{PROJECT_ACRONYM}",
+        "--tags",
+        f"env_{env}",
+    ]
+
+    json_object = execute_linode_cli(cmd)
+
     if json_object == []:
         logging.warning(f"No switch found in environment '{env}'")
         return
+
     id = json_object[0]["id"]
     logging.debug(f"switch id: {id}")
     cmd = ["linode-cli", "linodes", "delete", f"{id}"]
@@ -25,7 +37,12 @@ def switch_delete(env):
     logging.info(f"Deleted linode id {id} with nginx load balancer")
 
 def writeSshPrivateKeyToTmp():
-    decoded_private_key = base64.b64decode(os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64"))
+
+    private_key_b64 = os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64")
+    if private_key_b64 is None:
+        raise Exception("Error: SSH_NGINX_LB_PRIVATE_KEY_B64 is not set.")
+
+    decoded_private_key = base64.b64decode(private_key_b64)
     private_key_file = "/tmp/bgd_decoded.txt"
     with open(private_key_file, mode="w") as file:
         file.write(decoded_private_key.decode())
@@ -33,6 +50,15 @@ def writeSshPrivateKeyToTmp():
 
 
 def switch_create(env):
+
+    ssh_nginx_lb_public_key = os.environ.get("SSH_NGINX_LB_PUBLIC_KEY")
+    if ssh_nginx_lb_public_key is None:
+        raise Exception("Error: SSH_NGINX_LB_PUBLIC_KEY is not set.")
+
+    nginx_lb_root_password = os.environ.get("NGINX_LB_ROOT_PASSWORD")
+    if nginx_lb_root_password is None:
+        raise Exception("Error: NGINX_LB_ROOT_PASSWORD is not set.")
+
     """
     Create a linode instance with nginx as a switch to route traffic to k8s cluster
     """
@@ -49,9 +75,9 @@ def switch_create(env):
         "--type",
         "g6-standard-1",
         "--authorized_keys",
-        os.environ.get("SSH_NGINX_LB_PUBLIC_KEY"),
+        ssh_nginx_lb_public_key,
         "--root_pass",
-        os.environ.get("NGINX_LB_ROOT_PASSWORD"),
+        nginx_lb_root_password,
         "--tags",
         f"project_{PROJECT_ACRONYM}",
         "--tags",
