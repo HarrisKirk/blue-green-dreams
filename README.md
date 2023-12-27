@@ -34,7 +34,7 @@ The following environment variables are required:
 
   This will be the root password to the linode VM instance, this is requried to be set when creating an instance.
 
-## Commands example
+## Command examples
 
 * ```$ make build```
 * ```$ make build_deploy```
@@ -46,7 +46,10 @@ The following environment variables are required:
 * ```$ bgdctl deploy dev```
 * ```$ bgdctl switch create dev```
 * ```$ bgdctl switch delete dev```
-
+* ```$ bgdctl switch-set-ip-target-to-cluster dev blue```
+* ```$ bgdctl switch-set-ip-target-to-cluster dev green```
+* ```$ bgdctl switch-set-ip-target-to-cluster prod blue```
+* ```$ bgdctl switch-set-ip-target-to-cluster prod green```
 
 
 

@@ -216,8 +216,7 @@ def delete_environment(env: str):
     switch_resp = switch_module.switch_get(env)
     if switch_resp != []:
         switch_id = switch_resp[0]["id"]
-        logging.info(f"switch ID in environment {env} found: {switch_id}") 
-        switch_module.switch_delete(env)
+        logging.warning(f"switch ID in environment {env} found (no action taked): {switch_id}") 
 
 #\
 # All cli commands follow:
@@ -305,6 +304,13 @@ def switch(operation: str, env: str, log_level = "debug"):
         case "delete": switch_module.switch_delete(env)
         case _:
             raise Exception("invalid switch command")
+
+@app.command()
+def switch_set_ip_target_to_cluster(env: str, target_env: str):
+    switch_module.switch_set_ip_target_to_cluster(env, target_env)
+
+    logging.info(f"nginx switch (env: {env}) succesfully set to target ({target_env})")
+
 
 if __name__ == "__main__":
     app()
