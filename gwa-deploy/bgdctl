@@ -216,8 +216,7 @@ def delete_environment(env: str):
     switch_resp = switch_module.switch_get(env)
     if switch_resp != []:
         switch_id = switch_resp[0]["id"]
-        logging.info(f"switch ID in environment {env} found: {switch_id}") 
-        switch_module.switch_delete(env)
+        logging.warning(f"switch ID in environment {env} found (no action taked): {switch_id}") 
 
 #\
 # All cli commands follow:
