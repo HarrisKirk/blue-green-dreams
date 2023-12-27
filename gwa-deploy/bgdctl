@@ -306,5 +306,12 @@ def switch(operation: str, env: str, log_level = "debug"):
         case _:
             raise Exception("invalid switch command")
 
+@app.command()
+def switch_set_ip_target_to_cluster(env: str, target_env: str):
+    switch_module.switch_set_ip_target_to_cluster(env, target_env)
+
+    logging.info(f"nginx switch (env: {env}) succesfully set to target ({target_env})")
+
+
 if __name__ == "__main__":
     app()

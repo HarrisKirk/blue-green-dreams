@@ -1,10 +1,13 @@
 from common import execute_linode_cli, execute_sh
+import linodeapi
+import kubectl
 from retry import retry
 import logging
 import json
 import requests
 import os
 import base64
+import sys
 
 """
 Issue linode-cli commands to manage the controller switch
@@ -204,3 +207,52 @@ def switch_smoke_test(switch_ip):
         return True
     else:
         return False
+
+def switch_set_ip_target_to_cluster(env, target_env):
+
+    cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, target_env)
+
+    if cluster_id is None:
+        raise Exception(f"cluster_id not found for env of: {target_env}")
+
+    try:
+        kubeconfig = get_kubeconfig(cluster_id)
+    except Exception as e:
+        logging.exception("An exception occurred: %s", str(e))
+        sys.exit(2) # 2 is linode timeout
+
+    logging.debug(f"kubeconfig as yaml: {kubeconfig}")
+    write_kubeconfig(kubeconfig)
+
+    ingress_ip = kubectl.get_ingress_ip()
+
+    logging.debug(f"Attempt to set switch target IP to cluster's ingress IP ({ingress_ip})")
+    switch_ip_set(env, ingress_ip)
+
+# TODO - these functions are duplicated.  Refactor
+@retry(tries=60, delay=60)
+def get_kubeconfig(cluster_id):
+    cmd = [
+        "linode-cli",
+        "lke",
+        "kubeconfig-view",
+        cluster_id,
+    ]
+    json_object = execute_linode_cli(cmd)
+    base_64_kubeconfig = json_object[0]["kubeconfig"]
+    logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
+    logging.info(f"kubeconfig received OK from cluster {cluster_id}")
+    return base64.b64decode(base_64_kubeconfig).decode("ascii")
+
+
+def write_kubeconfig(kubeconfig):
+    KUBECONFIG_DIR = os.environ["HOME"] + "/.kube"
+    KUBECONFIG_FILE_PATH = KUBECONFIG_DIR + "/config"
+    try:
+        os.mkdir(KUBECONFIG_DIR)
+    except FileExistsError:
+        pass
+    with open(KUBECONFIG_FILE_PATH, "w") as file:
+        file.write(kubeconfig)
+    logging.info(f"kubernetes config file written: {KUBECONFIG_FILE_PATH}")
+    return
