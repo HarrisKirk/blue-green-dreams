@@ -3,13 +3,13 @@
 Manage all aspects of the creation of infrastructure and app deployment
 """
 from common import execute_linode_cli, execute_sh
+from kubeconfig import write_kubeconfig, get_kubeconfig
 import switch as switch_module
 import linodeapi
 import subprocess
 import kubectl
 import logging
 import time
-import base64
 import json
 import sys
 import os
@@ -53,21 +53,6 @@ def set_logging_level(level_param : str):
     )
 
 set_logging_level("debug")
-
-@retry(tries=60, delay=60)
-def get_kubeconfig(cluster_id):
-    cmd = [
-        "linode-cli",
-        "lke",
-        "kubeconfig-view",
-        cluster_id,
-    ]
-    json_object = execute_linode_cli(cmd)
-    base_64_kubeconfig = json_object[0]["kubeconfig"]
-    logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
-    logging.info(f"kubeconfig received OK from cluster {cluster_id}")
-    return base64.b64decode(base_64_kubeconfig).decode("ascii")
-
 
 def create_cluster(env):
     """Create a Akamai K8S cluster"""
@@ -133,19 +118,6 @@ def delete_cluster_only(cluster_id):
     json_object = execute_linode_cli(cmd)
     logging.debug(f"cluster-delete returned {json_object}")
     logging.info(f"Cluster id '{cluster_id}' was deleted")
-    return
-
-
-def write_kubeconfig(kubeconfig):
-    KUBECONFIG_DIR = os.environ["HOME"] + "/.kube"
-    KUBECONFIG_FILE_PATH = KUBECONFIG_DIR + "/config"
-    try:
-        os.mkdir(KUBECONFIG_DIR)
-    except FileExistsError:
-        pass
-    with open(KUBECONFIG_FILE_PATH, "w") as file:
-        file.write(kubeconfig)
-    logging.info(f"kubernetes config file written: {KUBECONFIG_FILE_PATH}")
     return
 
 
@@ -314,3 +286,4 @@ def switch_set_ip_target_to_cluster(env: str, target_env: str):
 
 if __name__ == "__main__":
     app()
+
