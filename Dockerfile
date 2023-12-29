@@ -10,6 +10,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --upgrade
 RUN pip install black
+RUN pip install flake8
 
 COPY ./gwa ./gwa
 
