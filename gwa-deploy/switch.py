@@ -5,7 +5,7 @@ import kubectl
 from retry import retry
 import logging
 import json
-import base64 
+import base64
 import requests
 import os
 import sys
@@ -40,8 +40,8 @@ def switch_delete(env):
     execute_sh(cmd)
     logging.info(f"Deleted linode id {id} with nginx load balancer")
 
-def writeSshPrivateKeyToTmp():
 
+def writeSshPrivateKeyToTmp():
     private_key_b64 = os.environ.get("SSH_NGINX_LB_PRIVATE_KEY_B64")
     if private_key_b64 is None:
         raise Exception("Error: SSH_NGINX_LB_PRIVATE_KEY_B64 is not set.")
@@ -54,7 +54,6 @@ def writeSshPrivateKeyToTmp():
 
 
 def switch_create(env):
-
     ssh_nginx_lb_public_key = os.environ.get("SSH_NGINX_LB_PUBLIC_KEY")
     if ssh_nginx_lb_public_key is None:
         raise Exception("Error: SSH_NGINX_LB_PUBLIC_KEY is not set.")
@@ -141,6 +140,7 @@ def switch_view(env):
     logging.info(msg)
     return ip
 
+
 def switch_ip_set(env, ip):
     switch = switch_get(env)
     switch_ip = switch[0]["ipv4"][0]
@@ -149,11 +149,11 @@ def switch_ip_set(env, ip):
     private_key_file = "/tmp/bgd_decoded.txt"
 
     # Prepare nginx config
-    with open('nginx-lb/nginx.conf', 'r') as infile:
+    with open("nginx-lb/nginx.conf", "r") as infile:
         content = infile.read()
-        content = content.replace('127.0.0.1', ip)
+        content = content.replace("127.0.0.1", ip)
 
-        with open('nginx-lb/nginx.conf.replaced', 'w') as outfile:
+        with open("nginx-lb/nginx.conf.replaced", "w") as outfile:
             outfile.write(content)
 
     # Transfer prepared nginx config file over
@@ -169,7 +169,6 @@ def switch_ip_set(env, ip):
         f"root@{switch_ip}:/etc/nginx/sites-available/default",
     ]
     wait_for_cmd(cmd)
-
 
     # Test valid nginx config. Reload nginx gracefully
     cmd = [
@@ -209,6 +208,7 @@ def switch_smoke_test(switch_ip):
     else:
         return False
 
+
 def switch_set_ip_target_to_cluster(env, target_env):
     cluster_id = linodeapi.get_cluster_id(PROJECT_ACRONYM, target_env)
 
@@ -219,7 +219,7 @@ def switch_set_ip_target_to_cluster(env, target_env):
         kubeconfig = get_kubeconfig(cluster_id)
     except Exception as e:
         logging.exception("An exception occurred: %s", str(e))
-        sys.exit(2) # 2 is linode timeout
+        sys.exit(2)  # 2 is linode timeout
 
     logging.debug(f"kubeconfig as yaml: {kubeconfig}")
     write_kubeconfig(kubeconfig)

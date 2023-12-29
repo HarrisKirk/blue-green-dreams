@@ -8,6 +8,7 @@ import logging
 Functions to get and set a cluster's kubeconfig file
 """
 
+
 def write_kubeconfig(kubeconfig):
     KUBECONFIG_DIR = os.environ["HOME"] + "/.kube"
     KUBECONFIG_FILE_PATH = KUBECONFIG_DIR + "/config"
@@ -34,5 +35,3 @@ def get_kubeconfig(cluster_id):
     logging.debug(f"kubeconfig base64: {base_64_kubeconfig}")
     logging.info(f"kubeconfig received OK from cluster {cluster_id}")
     return base64.b64decode(base_64_kubeconfig).decode("ascii")
-
-

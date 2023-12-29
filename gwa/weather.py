@@ -23,12 +23,15 @@ def get_rendered_site_data(weather_api_key):
 
 def get_day_info(parsed_json):
     days = [
-        dict({"datetime": day["datetime"], 
-              "high": round(celsius_to_fahrenheit(float(day["tempmax"]))), 
-              "feels": round(celsius_to_fahrenheit(float(day["feelslikemax"]))),
-              "low": round(celsius_to_fahrenheit(float(day["tempmin"]))),
-              "description": day["description"],
-        })
+        dict(
+            {
+                "datetime": day["datetime"],
+                "high": round(celsius_to_fahrenheit(float(day["tempmax"]))),
+                "feels": round(celsius_to_fahrenheit(float(day["feelslikemax"]))),
+                "low": round(celsius_to_fahrenheit(float(day["tempmin"]))),
+                "description": day["description"],
+            }
+        )
         for day in parsed_json["days"]
     ]
     return days
