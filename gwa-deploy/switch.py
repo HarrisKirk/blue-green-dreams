@@ -152,6 +152,7 @@ def switch_view(env):
                     break
             else:
                 logging.warning("Target ip is set to {} but it does not belong to any cluster.")
+    return ip
 
 # a bit hacky because it depends on the exact nginx config we have configured
 def switch_ip_get(env): 
