@@ -42,3 +42,12 @@ def execute_sh(cmd, wd="."):
         logging.debug(completed_process.stderr.decode())
         raise Exception()
     return stdout
+
+def execute_sh_allow_error(cmd, wd="."):
+    """Execute local shell command within the docker container"""
+    logging.debug(" ".join(cmd))
+    completed_process = subprocess.run(cmd, cwd=wd, check=False, shell=False, capture_output=True)
+    stdout = completed_process.stdout.decode().rstrip()
+    logging.debug(stdout)
+
+    return stdout
