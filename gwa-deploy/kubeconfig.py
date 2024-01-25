@@ -1,6 +1,6 @@
 import os
 import base64
-from common import execute_linode_cli, execute_sh
+from common import execute_linode_cli
 from retry import retry
 import logging
 
