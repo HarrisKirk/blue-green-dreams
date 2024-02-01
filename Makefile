@@ -43,8 +43,8 @@ format: ## format the python code consistently
 	docker container run -v $(PWD)/gwa:/gwa --entrypoint "black" $(DOCKER_IMAGE_NAME) --verbose --line-length=120 /gwa ;\
 	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy --entrypoint "black" $(DOCKER_DEPLOY_IMAGE_NAME) --verbose --line-length=120 /gwa-deploy ;\
 	# flake8 linting
-	docker container run -v $(PWD)/gwa:/gwa --entrypoint "flake8" $(DOCKER_IMAGE_NAME) --ignore=E5,F5,F4,F8,E7 /gwa/ ;\
-	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy --entrypoint "flake8" $(DOCKER_DEPLOY_IMAGE_NAME) --ignore=E5,F5,F4,F8,E7 /gwa-deploy
+	docker container run -v $(PWD)/gwa:/gwa --entrypoint "flake8" $(DOCKER_IMAGE_NAME) --ignore=E501 /gwa/ ;\
+	docker container run -v $(PWD)/gwa-deploy:/gwa-deploy --entrypoint "flake8" $(DOCKER_DEPLOY_IMAGE_NAME) --ignore=E501 /gwa-deploy
 
 web: build ## Launch a local docker flask site (locahost:8000 to view web page)
 	docker container rm -f $(PROJECT_ACRONYM) ;\

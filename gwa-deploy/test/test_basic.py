@@ -16,7 +16,7 @@ class TestUtil(unittest.TestCase):
                 try:
                     util.tags_as_dict(test_case[0])
                     is_success = False  # No exception but one was expected
-                except:
+                except:  # noqa: E722
                     is_success = True  # Exception - as expected
 
                 if is_success:

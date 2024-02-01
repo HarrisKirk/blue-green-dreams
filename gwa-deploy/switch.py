@@ -4,7 +4,6 @@ import linodeapi
 import kubectl
 from retry import retry
 import logging
-import json
 import base64
 import requests
 import os
@@ -112,7 +111,7 @@ def switch_create(env):
     logging.debug("nginx was installed with 'apt update'")
     logging.info(f"Created linode with nginx load balancer configured for project {PROJECT_ACRONYM}")
     if switch_smoke_test(ip):
-        logging.info(f"[OK] Nginx switch smoke test passes")
+        logging.info("[OK] Nginx switch smoke test passes")
     else:
         raise Exception(f"Smoke test of ip {ip} failed")
 

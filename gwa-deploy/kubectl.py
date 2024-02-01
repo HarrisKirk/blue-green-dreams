@@ -32,10 +32,10 @@ def apply_deployment():
     try:
         output = execute_sh(cmd)
     except Exception as e:
-        raise Exception(f"retrying {cmd}")
+        raise Exception(f"retrying {cmd} due to exception {e}")
     json_object = json.loads(output)
     logging.debug(f"json ==> {json_object}")
-    logging.info(f"kubectl deployment applied OK")
+    logging.info("kubectl deployment applied OK")
     return
 
 
@@ -44,7 +44,7 @@ def apply_service():
     output = execute_sh(cmd)
     json_object = json.loads(output)
     logging.debug(f"json ==> {json_object}")
-    logging.info(f"kubectl service applied OK")
+    logging.info("kubectl service applied OK")
     return
 
 
@@ -75,17 +75,17 @@ def get_ingress_ip():
     logging.debug(f"json ==> {json_object}")
     ingress_ip = json_object["status"]["loadBalancer"]["ingress"][0]["ip"]
     if not ingress_ip:
-        raise Exception(f"Ingress IP is empty in the returned json")
+        raise Exception("Ingress IP is empty in the returned json")
     logging.info(f"Load Balance Ingress is: {ingress_ip}")
     return ingress_ip
 
 
 def apply_argocd():
     cmd = ["ls", "-al"]
-    output = execute_sh(cmd)
+    execute_sh(cmd)
 
     cmd = ["kubectl", "create", "namespace", "argocd"]
-    output = execute_sh(cmd)
+    execute_sh(cmd)
 
     # cmd = ["kubectl", "apply", "--namespace=argocd", "--dry-run=server", "-k", "."]
     # output = execute_sh(cmd, "./resources")

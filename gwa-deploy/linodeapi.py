@@ -15,7 +15,7 @@ LINODE_API_ROOT = "https://api.linode.com/v4"
 
 
 def get_k8s_nodes():
-    parsed_json = _invoke_rest_call(f"/linode/instances")
+    parsed_json = _invoke_rest_call("/linode/instances")
     all_linodes = parsed_json["data"]
     label_prefix_lke = "lke"
     k8s_nodes = [linode for linode in all_linodes if linode["label"].startswith(label_prefix_lke)]
@@ -27,7 +27,7 @@ def get_nodebalancer_id_by_ingress(ingress_ip):
     Get the id of the nodebalancer created by kubernetes.
     The nodebalancer is an Akamai artifact that the kubernetes service depends on
     """
-    parsed_json = _invoke_rest_call(f"/nodebalancers")
+    parsed_json = _invoke_rest_call("/nodebalancers")
     logging.debug(parsed_json)
     data = parsed_json["data"]
     ids = [{"id": nb["id"], "ipv4": nb["ipv4"]} for nb in data if nb["ipv4"] == ingress_ip]
@@ -37,7 +37,7 @@ def get_nodebalancer_id_by_ingress(ingress_ip):
 
 
 def get_nodebalancer_id(project: str, env: str):
-    parsed_json = _invoke_rest_call(f"/nodebalancers")
+    parsed_json = _invoke_rest_call("/nodebalancers")
     data = parsed_json["data"]
     nodebalancers = []
     for nb in data:
@@ -55,7 +55,7 @@ def get_nodebalancer_id(project: str, env: str):
 
 def get_cluster_id(project: str, env: str):
     """Get the cluster ID of the k8s cluster in the project and environment"""
-    parsed_json = _invoke_rest_call(f"/lke/clusters")
+    parsed_json = _invoke_rest_call("/lke/clusters")
     data = parsed_json["data"]
     clusters = []
     for cluster in data:
