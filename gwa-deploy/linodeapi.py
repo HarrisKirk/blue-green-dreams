@@ -3,6 +3,8 @@ import os
 import json
 import logging
 import util
+import kubeconfig
+import kubectl
 
 """
 Use the linode REST api to read information about account artifacts
@@ -80,3 +82,24 @@ def _invoke_rest_call(url: str):
     pretty_json_string = json.dumps(parsed_json, indent=4, sort_keys=True)
     logging.debug(pretty_json_string)
     return parsed_json
+
+def get_cluster_and_ingress_ip_groups():
+
+    parsed_json = _invoke_rest_call(f"/lke/clusters")
+
+    clusters_data = parsed_json["data"]
+
+    cluster_and_ips = []
+
+    for cluster in [cluster for cluster in clusters_data if "project_bgd" in cluster.get("tags", [])]:
+        try:
+            kubeconfig.write_kubeconfig(kubeconfig.get_kubeconfig(str(cluster["id"])))
+            ip = kubectl.get_ingress_ip()
+            cluster_and_ips.append((cluster["label"], cluster["id"], ip))
+        except Exception as e:
+            cluster_label = cluster["label"]
+            cluster_id = cluster["id"]
+            logging.warning(f"An error occurred while fetching cluster or it's ingress ip (label: {cluster_label}, id: {cluster_id}): {e}")    
+    
+    return cluster_and_ips
+

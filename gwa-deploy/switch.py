@@ -1,4 +1,4 @@
-from common import execute_linode_cli, execute_sh
+from common import execute_linode_cli, execute_sh, execute_sh_allow_error
 from kubeconfig import write_kubeconfig, get_kubeconfig
 import linodeapi
 import kubectl
@@ -8,6 +8,7 @@ import base64
 import requests
 import os
 import sys
+import linodeapi
 
 """
 Issue linode-cli commands to manage the controller switch
@@ -136,9 +137,58 @@ def switch_view(env):
     else:
         ip = response[0]["ipv4"][0]
         msg = f"IP of switch is: {ip}"
-    logging.info(msg)
+        logging.info(msg)
+
+        target_ip = switch_ip_get(env)
+        cluster_and_ingress_ip_groups = linodeapi.get_cluster_and_ingress_ip_groups()
+
+        if target_ip is None:
+            logging.info(f"Target ip is not set.")
+        else:
+            for cluster_label, cluster_id, ips in cluster_and_ingress_ip_groups:
+                if target_ip in ips:
+                    logging.info(f"Target ip is set to {target_ip} which belongs to cluster (label: {cluster_label}, id: {cluster_id})")
+                    break
+            else:
+                logging.warning("Target ip is set to {} but it does not belong to any cluster.")
     return ip
 
+# a bit hacky because it depends on the exact nginx config we have configured
+def switch_ip_get(env): 
+    switch = switch_get(env)
+    switch_ip = switch[0]["ipv4"][0]
+
+    writeSshPrivateKeyToTmp()
+    private_key_file = "/tmp/bgd_decoded.txt"
+
+    cmd = [
+        "ssh",
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "BatchMode=yes",
+        "-i",
+        private_key_file,
+        f"root@{switch_ip}",
+        # r"""cat /etc/nginx/sites-available/default | sed -n 's/proxy_pass \(http\|https\):\/\/\([^:]\+\).*/\2/p' | sed 's/\s//g'"""
+        "cat /etc/nginx/sites-available/default | grep bgdctl"
+    ]
+    if "bgdctl" in execute_sh_allow_error(cmd):
+        cmd = [
+            "ssh",
+            "-o",
+            "StrictHostKeyChecking=no",
+            "-o",
+            "BatchMode=yes",
+            "-i",
+            private_key_file,
+            f"root@{switch_ip}",
+            # r"""cat /etc/nginx/sites-available/default | sed -n 's/proxy_pass \(http\|https\):\/\/\([^:]\+\).*/\2/p' | sed 's/\s//g'"""
+            r"""cat /etc/nginx/sites-available/default | sed -n 's/proxy_pass \(http\|https\):\/\/\([^:]\+\).*/\2/p' | sed 's/\s//g' """
+        ]
+        return execute_sh(cmd)
+    else:
+        return None
 
 def switch_ip_set(env, ip):
     switch = switch_get(env)
