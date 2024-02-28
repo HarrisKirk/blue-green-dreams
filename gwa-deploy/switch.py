@@ -1,4 +1,4 @@
-from common import execute_linode_cli, execute_sh
+from common import execute_linode_cli, execute_sh, set_logging_level
 from kubeconfig import write_kubeconfig, get_kubeconfig
 import linodeapi
 import kubectl
@@ -8,6 +8,7 @@ import base64
 import requests
 import os
 import sys
+import typer
 
 """
 Issue linode-cli commands to manage the controller switch
@@ -16,7 +17,8 @@ Issue linode-cli commands to manage the controller switch
 PROJECT_ACRONYM = "bgd"
 
 
-def switch_delete(env):
+def delete(env, log_level: str = "debug"):
+    set_logging_level(log_level)
     cmd = [
         "linode-cli",
         "linodes",
@@ -52,7 +54,13 @@ def writeSshPrivateKeyToTmp():
     execute_sh(["chmod", "600", private_key_file])
 
 
-def switch_create(env):
+def create(env, log_level: str = "debug"):
+    """
+    Create a linode instance with nginx as a switch to route traffic to k8s cluster
+    """
+
+    set_logging_level(log_level)
+
     ssh_nginx_lb_public_key = os.environ.get("SSH_NGINX_LB_PUBLIC_KEY")
     if ssh_nginx_lb_public_key is None:
         raise Exception("Error: SSH_NGINX_LB_PUBLIC_KEY is not set.")
@@ -61,9 +69,6 @@ def switch_create(env):
     if nginx_lb_root_password is None:
         raise Exception("Error: NGINX_LB_ROOT_PASSWORD is not set.")
 
-    """
-    Create a linode instance with nginx as a switch to route traffic to k8s cluster
-    """
     cmd = [
         "linode-cli",
         "linodes",
@@ -127,8 +132,12 @@ def wait_for_http_get(ip):
     logging.debug(f"Get of {smoke_test_url}")
     return requests.get(smoke_test_url)
 
+def view(env: str, log_level: str = "debug"):
+    """
+    View IP address of switch in environment if it exists
+    """
+    set_logging_level(log_level)
 
-def switch_view(env):
     response = switch_get(env)
     if response == []:
         msg = f"No switch exists in environment '{env}'"

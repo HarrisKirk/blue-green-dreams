@@ -2,9 +2,10 @@
 """
 Manage all aspects of the creation of infrastructure and app deployment
 """
-from common import execute_linode_cli, execute_sh
+from common import execute_linode_cli, execute_sh, set_logging_level
 from kubeconfig import write_kubeconfig, get_kubeconfig
 import switch as switch_module
+import switch_cmd
 import linodeapi
 import subprocess
 import kubectl
@@ -24,33 +25,6 @@ app = typer.Typer()
 
 KUBERNETES_VERSION = "1.28"
 
-def set_logging_level(level_param : str):
-
-    # Remove any existing handlers
-    for handler in logging.root.handlers[:]:
-        logging.root.removeHandler(handler)
-
-    level_param = level_param.lower()  # Convert to lowercase for case-insensitivity
-
-    match level_param:
-        case "debug":
-            logging_level = logging.DEBUG
-        case "info":
-            logging_level = logging.INFO
-        case "warning":
-            logging_level = logging.WARNING
-        case "error":
-            logging_level = logging.ERROR
-        case "critical":
-            logging_level = logging.CRITICAL
-        case _:
-            raise ValueError(f"Invalid log level: {level_param}")
-
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
-        level=logging_level,
-        datefmt="%Y-%m-%d at %H:%M:%S",
-    )
 
 set_logging_level("debug")
 
@@ -204,10 +178,10 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
     cluster_id, ingress_ip = deploy_kubernetes_artifacts(env)
     tests_pass = deployment_smoke_test(ingress_ip)
 
-    switch_module.switch_delete(env)
-    switch_module.switch_create(env)
+    switch_module.delete(env)
+    switch_module.create(env)
 
-    switch_ip = switch_module.switch_view(env)
+    switch_ip = switch_module.view(env)
     if not switch_ip == '':
         switch_module.switch_smoke_test(switch_ip)
     else:
@@ -229,7 +203,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
         logging.info(f"Cluster ID {cluster_id} is running and incurring charges!")
 
     if not keep_switch:
-        switch_module.switch_delete(env)
+        switch_module.delete(env)
     else:
         logging.info(f"Switch is running and incurring charges!")
 
@@ -243,7 +217,7 @@ def deploy(env: str, keep: bool = typer.Option(False, help="Keep the cluster run
 
 @app.command()
 def ls(
-    env: str , log_level = "debug"
+    env: str , log_level : str  = "debug"
 ):
     set_logging_level(log_level)
 
@@ -252,7 +226,7 @@ def ls(
     logging.info(f"Cluster ID with tag 'env_{env}': {cluster_id}")  
     nodebalancer_id = linodeapi.get_nodebalancer_id(PROJECT_ACRONYM, env)
     logging.info(f"nodebalancer ID with tag 'env_{env}': {nodebalancer_id}")
-    switch_id = switch_module.switch_view(env)
+    switch_id = switch_module.view(env)
     logging.info(f"switch id with tag 'env_{env}: {switch_id}")
 
 @app.command()
@@ -264,18 +238,7 @@ def rm(
     """Remove all artifacts in the env"""
     delete_environment(env)
 
-@app.command()
-def switch(operation: str, env: str, log_level = "debug"):
-    set_logging_level(log_level)
 
-    """Perform all operations related to the front-end nginx switch"""
-    match operation:
-        case "create": 
-            switch_module.switch_create(env)
-        case "view": switch_module.switch_view(env)
-        case "delete": switch_module.switch_delete(env)
-        case _:
-            raise Exception("invalid switch command")
 
 @app.command()
 def switch_set_ip_target_to_cluster(env: str, target_env: str):
@@ -285,5 +248,6 @@ def switch_set_ip_target_to_cluster(env: str, target_env: str):
 
 
 if __name__ == "__main__":
+    app.add_typer(switch_cmd.switch_app, name="switch", help="Nginx switch operations")
     app()
 

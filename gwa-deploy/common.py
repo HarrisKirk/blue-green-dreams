@@ -4,7 +4,7 @@ Common shell commands.
 import subprocess
 import json
 import logging
-
+import typer
 
 def execute_linode_cli(cmd):
     # Check if all elements in cmd are strings
@@ -42,3 +42,33 @@ def execute_sh(cmd, wd="."):
         logging.debug(completed_process.stderr.decode())
         raise Exception()
     return stdout
+
+def set_logging_level(level_param : str):
+
+    # Remove any existing handlers
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
+    level_param = level_param.lower()  # Convert to lowercase for case-insensitivity
+
+    match level_param:
+        case "debug":
+            logging_level = logging.DEBUG
+        case "info":
+            logging_level = logging.INFO
+        case "warning":
+            logging_level = logging.WARNING
+        case "error":
+            logging_level = logging.ERROR
+        case "critical":
+            logging_level = logging.CRITICAL
+        case _:
+            raise ValueError(f"Invalid log level: {level_param}")
+
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)-9s %(funcName)-30s() %(message)s ",
+        level=logging_level,
+        datefmt="%Y-%m-%d at %H:%M:%S",
+    )
+
+log_level_arg = typer.Option(default="debug", help="The output logging level. This can be one of: debug, info, warning, error and critical.")
